@@ -26,8 +26,8 @@ func main() {
 	router.Get("/api/getExample", getHandler)
 	router.Get("/api/post", postHandler)
 
-	router.HandleFunc("/auth/ms", controllers.MicrosoftLogin)
-	router.HandleFunc("/auth/ms/callback", controllers.MicrosoftCallback)
+	router.HandleFunc("/auth", controllers.MicrosoftLogin)
+	router.HandleFunc("/auth/ms", controllers.MicrosoftCallback)
 
 	fmt.Println("Server listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))

@@ -8,7 +8,6 @@ import (
 
 
 func SetupConfig() *oauth2.Config{
-	
 	conf := &oauth2.Config{
 		ClientID:     os.Getenv("CLIENT_ID"),
 		ClientSecret: os.Getenv("CLIENT_SECRET"),
