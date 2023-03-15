@@ -38,6 +38,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	token, err := microsoftConfig.Exchange(context.Background(), code)
 	if err != nil {
 		helper.RequestError("ms.go 42", "error", "Code-Token Exchange Failed", w, *req)
+		fmt.Println("ms go 42 error", err)
 		return
 	}
 
@@ -45,6 +46,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	resp, err := client.Get("https://graph.microsoft.com/v1.0/me")
 	if err != nil {
 		helper.RequestError("ms.go 49", "error", "Error getting user", w, *req)
+		fmt.Println("ms go 49 error", err)
 		return
 	}
 
@@ -52,6 +54,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		helper.RequestError("ms.go 55", "error", "Parsing data failed", w, *req)
 		fmt.Println(err, "Parsing data failed")
+		fmt.Println("ms go 57 error", err)
 		return
 	}
 
