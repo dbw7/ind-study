@@ -1,0 +1,13 @@
+.piece{
+    display: inline-grid;
+    text-align: center;
+    margin: auto;
+    width: 50%;
+    
+    
+}
+
+.board-piece{
+    height: 75px;
+    margin-top: 10px;
+}
