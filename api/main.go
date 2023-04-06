@@ -3,13 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"independent-study-api/controllers"
-	ws2 "independent-study-api/pkg/ws"
-	"log"
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	"independent-study-api/controllers"
+	ws2 "independent-study-api/internal/ws"
+	"log"
+	"net/http"
 )
 
 func init() {

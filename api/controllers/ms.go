@@ -4,20 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"independent-study-api/config"
 	"independent-study-api/helper"
+	"independent-study-api/internal/config"
+	"independent-study-api/internal/db"
 	"io"
 	"net/http"
 )
-
-type MicrosoftUser struct {
-	ID          string `json:"id"`
-	GivenName   string `json:"givenName"`
-	Surname     string `json:"surname"`
-	// Mail        string `json:"mail"`
-	Mail        string `json:"userPrincipalName"`
-	DisplayName string `json:"displayName"`
-}
 
 func MicrosoftLogin(w http.ResponseWriter, req *http.Request) {
 	microsoftConfig := config.SetupConfig()
@@ -59,12 +51,13 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var user MicrosoftUser
+	var user db.MicrosoftUser
 	if err := json.Unmarshal(body, &user); err != nil {
 		helper.RequestError("ms.go 62", "error", "Can not unmarshal JSON", w, *req)
 		fmt.Println("Can not unmarshal JSON", err)
 		return
 	}
 	fmt.Println(user)
+	db.FindOrCreateUser(user)
 	defer resp.Body.Close()
 }
