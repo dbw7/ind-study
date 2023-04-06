@@ -14,7 +14,8 @@ type MicrosoftUser struct {
 	ID          string `json:"id"`
 	GivenName   string `json:"givenName"`
 	Surname     string `json:"surname"`
-	Mail        string `json:"mail"`
+	// Mail        string `json:"mail"`
+	Mail        string `json:"userPrincipalName"`
 	DisplayName string `json:"displayName"`
 }
 

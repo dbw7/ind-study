@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"independent-study-api/controllers"
 	ws2 "independent-study-api/pkg/ws"
 	"log"
 	"net/http"
@@ -37,9 +38,9 @@ func main() {
 	//router.Get("/api/getExample", getHandler)
 	//router.Get("/api/post", postHandler)
 
-	//router.HandleFunc("/auth", controllers.MicrosoftLogin)
-	//router.HandleFunc("/auth/ms", controllers.MicrosoftCallback)
-	router.HandleFunc("/ws", serveWs)
+	router.HandleFunc("/auth", controllers.MicrosoftLogin)
+	router.HandleFunc("/auth/ms", controllers.MicrosoftCallback)
+	//router.HandleFunc("/ws", serveWs)
 
 	fmt.Println("Server listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
