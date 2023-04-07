@@ -42,7 +42,8 @@ func init() {
 
 // Searches for user in the database using the info from MS
 // Returns the user and a bool on whether the user was found in the db
-func findUser(user MicrosoftUser) (MicrosoftUser, bool) {
+
+func FindUser(user MicrosoftUser) (MicrosoftUser, bool) {
 	var result MicrosoftUser
 	err := UserCollection.FindOne(Ctx, user).Decode(&result)
 
@@ -66,7 +67,7 @@ func findUser(user MicrosoftUser) (MicrosoftUser, bool) {
 //On whether the user was successfully found/added to the database or not
 
 func FindOrCreateUser(user MicrosoftUser) bool {
-	_, foundUser := findUser(user)
+	_, foundUser := FindUser(user)
 
 	if !foundUser {
 		result, err := UserCollection.InsertOne(Ctx, user)
