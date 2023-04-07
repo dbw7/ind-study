@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"independent-study-api/controllers"
 	ws2 "independent-study-api/internal/ws"
+	"independent-study-api/middleware"
 	"log"
 	"net/http"
 )
@@ -35,7 +36,7 @@ func main() {
 
 	router := chi.NewRouter()
 	//router.Get("/api/getExample", getHandler)
-	//router.Get("/api/post", postHandler)
+	router.Get("/api/getExample", middleware.AuthMiddleware(http.HandlerFunc(getHandler)))
 
 	router.HandleFunc("/auth", controllers.MicrosoftLogin)
 	router.HandleFunc("/auth/ms", controllers.MicrosoftCallback)

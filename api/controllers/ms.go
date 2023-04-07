@@ -54,10 +54,13 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	var user db.MicrosoftUser
 	if err := json.Unmarshal(body, &user); err != nil {
 		helper.RequestError("ms.go 62", "error", "Can not unmarshal JSON", w, *req)
-		fmt.Println("Can not unmarshal JSON", err)
+		fmt.Println("57 Can not unmarshal JSON", err)
 		return
 	}
-	fmt.Println(user)
+	//fmt.Println(user)
 	db.FindOrCreateUser(user)
+	tokenString, worked := helper.CreateToken("", user)
+	_ = worked
+	helper.ParseToken(tokenString)
 	defer resp.Body.Close()
 }
