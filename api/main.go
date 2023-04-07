@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"independent-study-api/controllers"
 	ws2 "independent-study-api/internal/ws"
-	"independent-study-api/middleware"
 	"log"
 	"net/http"
 )
@@ -35,9 +35,19 @@ func main() {
 	fmt.Println("Starting server...")
 
 	router := chi.NewRouter()
+	router.Use(cors.Handler(cors.Options{
+		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
+		AllowedOrigins: []string{"https://*", "http://*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 	//router.Get("/api/getExample", getHandler)
-	router.Get("/api/getExample", middleware.AuthMiddleware(http.HandlerFunc(getHandler)))
-
+	//router.Get("/api/test", middleware.AuthMiddleware(http.HandlerFunc(getHandler)))
+	router.Get("/api/test", testHandler)
 	router.HandleFunc("/auth", controllers.MicrosoftLogin)
 	router.HandleFunc("/auth/ms", controllers.MicrosoftCallback)
 	//router.HandleFunc("/ws", serveWs)
@@ -47,8 +57,8 @@ func main() {
 
 }
 
-func getHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("You got me")
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
 
 func postHandler(w http.ResponseWriter, r *http.Request) {
