@@ -1,0 +1,31 @@
+.login{
+    height: calc(100vh - 220px);
+    height: -o-calc(100% - 220px); /* opera */
+    height: -webkit-calc(100% - 220px); /* google, safari */
+    height: -moz-calc(100% - 220px); /* firefox */
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+.login-button{
+    width: 230px;
+    margin-top: 15%;
+}
+
+@media only screen and (max-width: 1000px) {
+    .login-button{
+        margin-top: 27.5%;
+    }
+}
+
+@media only screen and (min-width: 1750px) {
+    .login{
+        height: calc(100vh - 220px);
+        height: -o-calc(100% - 220px); /* opera */
+        height: -webkit-calc(100% - 220px); /* google, safari */
+        height: -moz-calc(100% - 220px); /* firefox */
+        display: flex;
+        justify-content: center;
+        text-align: center;
+    }
+}

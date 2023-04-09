@@ -1,11 +1,7 @@
 import React from "react";
 import { useState } from "react";
+import UserData from "../types/UserData";
 
-type UserData  = {
-    userId: string,
-    name: string,
-    email: string,
-};
 export type AuthContextType = {
     token: string | null,
     userData: UserData;
@@ -17,7 +13,9 @@ type ContextProps = {
     children: React.ReactNode;
 };
 
-const AuthContext = React.createContext<AuthContextType | null>(null);
+const initialContext = {} as AuthContextType;
+
+const AuthContext = React.createContext<AuthContextType>(initialContext);
 
 //React.FC<React.ReactNode>
 export const AuthContextProvider = (props: ContextProps) => {
@@ -25,7 +23,11 @@ export const AuthContextProvider = (props: ContextProps) => {
     let initialUserDataString = localStorage.getItem('userData');
     let initalUserDataObject = {} as UserData;
     if(initialUserDataString){
-        initalUserDataObject = JSON.parse(initialUserDataString);
+        try {
+            initalUserDataObject = JSON.parse(initialUserDataString);
+        } catch (error) {
+            console.log("error 29 auth contexxt", error)
+        }
     }
     const [token, setToken] = useState(initialToken);
     const [userData, setUserData] = useState(initalUserDataObject);

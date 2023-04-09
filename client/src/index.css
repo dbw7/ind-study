@@ -1,23 +1,18 @@
-/* html, body{
-  height: 100%;
-  width: 100%;
-} */
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
-/* :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+body {
+  margin: 0;
+  font-family: Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-  height: 100%;
+  background-color: hsl(250.91deg 24.44% 8.82%);
+  color: white;
+  /*background: linear-gradient(327.21deg, rgba(33, 0, 75, 0.24) 3.65%, rgba(60, 0, 136, 0) 40.32%), linear-gradient(245.93deg, rgba(209, 21, 111, 0.16) 0%, rgba(209, 25, 80, 0) 36.63%), linear-gradient(147.6deg, rgba(58, 19, 255, 0) 29.79%, rgba(98, 19, 255, 0.01) 85.72%), #13111C;*/
+  background-image: radial-gradient( circle farthest-corner at 90.8% 12.5%,  rgba(3,19,46,1) 0%, rgb(13, 11, 16) 90% );
+  /* background-image: radial-gradient( circle farthest-corner at 90.8% 12.5%,  rgba(3,19,46,1) 0%, rgba(28,19,19,1) 90% ); */
+  /* background-image: linear-gradient( 94.3deg,  rgba(26,33,64,1) 10.9%, rgba(81,84,115,1) 87.1% ); */
+  /* background-image: linear-gradient( 76.3deg,  rgba(44,62,78,1) 12.6%, rgba(69,103,131,1) 82.8% ); */
+  min-height: 100vh;
   width: 100%;
-} */
+}
 
