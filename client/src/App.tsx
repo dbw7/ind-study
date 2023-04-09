@@ -3,11 +3,12 @@ import { connect, sendMsg } from './api'
 import './App.css'
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import CBoard from './components/CBoard/CBoard'
+import CBoard from './components/ChessBoard/ChessBoard'
 import AuthContext from './context/auth-context'
 import Homepage from './pages/Homepage/Homepage';
 import Login from './pages/Login/Login';
 import Navbar from './components/Navbar/Navbar';
+import Game from './pages/Game/Game';
 
 const App: React.FC = ()  => {
   
@@ -21,6 +22,7 @@ const App: React.FC = ()  => {
       <Routes>
           <Route path='/' element={<Homepage />} />
           <Route path='/login' element={<Login />}/>
+          <Route path='/game' element={<Game />}/>
       </Routes>
     </div>
   )
