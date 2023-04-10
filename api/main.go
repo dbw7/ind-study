@@ -44,6 +44,8 @@ func main() {
 	router.Get("/auth/verify", verifyHandler)
 	router.HandleFunc("/ws:{room}:{player}", ws.ServeWs)
 
+	go ws.ListenToWsChannel()
+
 	fmt.Println("Server listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
 

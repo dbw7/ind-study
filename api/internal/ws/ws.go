@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"independent-study-api/helper"
 	"log"
+	"math/rand"
 	"net/http"
 	"strings"
 	"sync"
@@ -21,15 +22,6 @@ type WebSocketConnection struct {
 	*websocket.Conn
 }
 
-type WsJsonResponse struct {
-	Action       string `json:"action"`
-	Message      string `json:"message"`
-	MessageType  string `json:"message_type"`
-	ReadyToStart bool   `json:"ready_to_start"`
-	Room         string `json:"room"`
-	Player1      string `json:"player1"`
-}
-
 var wsChan = make(chan WsPayload)
 
 // var games = make(map[WebSocketConnection]*Game)
@@ -38,14 +30,16 @@ var connections = make(map[string]*Game)
 var mu sync.Mutex
 
 type Game struct {
-	P1      string
-	P2      string
-	RoomID  string
-	P1White bool
-	Started bool
-	P1Conn  WebSocketConnection
-	P2Conn  WebSocketConnection
-	Locked  bool
+	P1       string
+	P2       string
+	RoomID   string
+	P1Turn   bool
+	Started  bool
+	P1Conn   WebSocketConnection
+	P2Conn   WebSocketConnection
+	Locked   bool
+	WhosTurn string
+	First    string
 }
 
 func ServeWs(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +57,6 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 			RoomID:  freshRoom,
 			P1:      player,
 			P1Conn:  conn,
-			P1White: true,
 			Started: false,
 			Locked:  false,
 		}
@@ -74,15 +67,26 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 		go ListenForWs(&conn)
 	} else {
 		conn := WebSocketConnection{Conn: ws}
-		if contains(connections, roomID) && !connections[roomID].Locked {
+		if contains(connections, roomID) && len(connections[roomID].P2) == 0 {
 			connections[roomID].P2 = player
 			connections[roomID].P2Conn = conn
 			connections[roomID].Locked = true
+			connections[roomID].Started = true
+
+			if (rand.Intn(2) == 0) {
+				connections[roomID].First = connections[roomID].P2
+				connections[roomID].WhosTurn = connections[roomID].P2
+			} else {
+				connections[roomID].First = connections[roomID].P1
+				connections[roomID].WhosTurn = connections[roomID].P1
+			}
+
 			conn.WriteJSON(connections[roomID])
 			connections[roomID].P1Conn.WriteJSON(connections[roomID])
 			go ListenForWs(&conn)
 		} else {
 			conn.WriteJSON("Room is full or doesn't exist")
+			conn.Close()
 		}
 	}
 
@@ -92,6 +96,7 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
 }
 
 type WsPayload struct {
@@ -111,14 +116,15 @@ func ListenForWs(conn *WebSocketConnection) {
 			log.Println("Error", fmt.Sprintf("%v", r))
 		}
 	}()
-
 	var payload WsPayload
 	for {
 		err := conn.ReadJSON(&payload)
-		fmt.Println("Payload", &payload)
 		if err != nil {
 			//do nothing, there is no payload
+			fmt.Println("error", err)
+			break
 		} else {
+			fmt.Println("Payload", payload)
 			payload.Conn = *conn
 			//sends this to the websocket channel
 			wsChan <- payload
@@ -126,27 +132,48 @@ func ListenForWs(conn *WebSocketConnection) {
 	}
 }
 
-//func ListenToWsChannel() {
-//	var response WsJsonResponse
-//	for {
-//		event := <-wsChan
-//		switch event.Action {
-//		case "username":
-//			//Get list of all users and send back via broadcast
-//
-//		case "left":
-//			response.Action = "list_users"
-//
-//		case "broadcast":
-//			response.Action = "broadcast"
-//			response.Message = fmt.Sprintf("<strong>%s</strong>: %s", event.Username, event.Message)
-//
-//		}
-//		//response.Action = "Got here"
-//		//response.Message = fmt.Sprintf("Some message and action was %s", event.Action)
-//		//broadCastToAll(response)
-//	}
-//}
+type WsJsonResponse struct {
+	Action       string
+	Message      string
+	MessageType  string
+	ReadyToStart bool
+	RoomID       string
+	WhosTurn     string
+	Fen          string
+	Started      bool
+	First        string
+}
+
+func ListenToWsChannel() {
+	var response WsJsonResponse
+	for {
+		event := <-wsChan
+		room := event.Room
+		fmt.Println("room", room)
+		conn1 := connections[room].P1Conn
+		conn2 := connections[room].P2Conn
+		response.Fen = event.Fen
+		response.Started = true
+		response.RoomID = event.Room
+		response.First = connections[room].First
+		if event.Email == connections[room].P1 {
+			response.WhosTurn = connections[room].P2
+		} else {
+			response.WhosTurn = connections[room].P1
+		}
+		err := conn1.WriteJSON(response)
+		if err != nil {
+			log.Println("Websocket err")
+		}
+		err = conn2.WriteJSON(response)
+		if err != nil {
+			log.Println("Websocket err")
+		}
+		//response.Action = "Got here"
+		//response.Message = fmt.Sprintf("Some message and action was %s", event.Action)
+		//broadCastToAll(response)
+	}
+}
 
 func freshRoomID() string {
 	mu.Lock()

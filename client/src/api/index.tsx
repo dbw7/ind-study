@@ -1,7 +1,6 @@
 import CMove from "../types/Move";
 
-const connect = (room: string, player: string) => {
-  let socket = new WebSocket(`ws://localhost:8080/ws:${room}:${player}`);
+const connect = (socket:WebSocket) => {
   
   console.log("Attempting Connection...");
 
@@ -9,10 +8,7 @@ const connect = (room: string, player: string) => {
     console.log("Successfully Connected");
   };
   
-  socket.onmessage = msg => {
-    console.log(JSON.parse(msg.data));
-    //cb(msg);
-  };
+  
 
   socket.onclose = event => {
     console.log("Socket Closed Connection: ", event);
@@ -22,17 +18,18 @@ const connect = (room: string, player: string) => {
     console.log("Socket Error: ", error);
   };
   console.log("socket xxxx")
-  return socket;
+  //return socket;
 };
 
-const sendMsg = (socket:WebSocket, move: CMove) => {
+const sendMsgx = (socket:WebSocket, move: CMove) => {
+  console.log("sending")
   try {
-    console.log("sending msg: ", move);
     socket.send(JSON.stringify(move));
   } catch (error) {
-    console.log("error 33", error)
+    console.log("socket err 31", error)
   }
+ 
 };
 
 
-export { connect, sendMsg };
+export { connect, sendMsgx };

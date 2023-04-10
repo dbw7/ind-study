@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react'
-import { connect, sendMsg } from './api'
 import './App.css'
 import { Routes, Route, Navigate } from 'react-router-dom';
 

@@ -8,8 +8,6 @@ export type AuthContextType = {
     isLoggedIn: boolean;
     login: (token:string, userData:UserData) => void;
     logout: () => void;
-    setSocket: (socket: WebSocket) => void;
-    socket: WebSocket | undefined
 };
 type ContextProps = {
     children: React.ReactNode;
@@ -33,7 +31,6 @@ export const AuthContextProvider = (props: ContextProps) => {
     }
     const [token, setToken] = useState(initialToken);
     const [userData, setUserData] = useState(initalUserDataObject);
-    const [socket, setSocket] = useState<WebSocket>();
     
     const userIsLoggedIn = !!token;
     
@@ -50,17 +47,13 @@ export const AuthContextProvider = (props: ContextProps) => {
         setUserData(nullUserData);
         localStorage.clear();
     }
-    const socketHandler = (socket:WebSocket) => {
-        setSocket(socket);
-    }
+    
     const contextValue:AuthContextType = {
         token: token,
         userData: userData,
         isLoggedIn: userIsLoggedIn,
         login: loginHandler,
         logout: logoutHandler,
-        socket: socket,
-        setSocket:socketHandler 
     }
     
     return <AuthContext.Provider value={contextValue}>
