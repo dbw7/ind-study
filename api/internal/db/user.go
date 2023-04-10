@@ -12,8 +12,8 @@ import (
 type MicrosoftUser struct {
 	ID string `json:"ID" bson:"_id,omitempty"`
 	//MSID      string             `json:"MSID" bson:"msid"`
-	FirstName string `json:"givenName" bson:"givenName"`
-	LastName  string `json:"surname" bson:"surname"`
+	GivenName string `json:"givenName" bson:"givenName"`
+	Surname   string `json:"surname" bson:"surname"`
 	// Mail        string `json:"mail"`
 	Email       string `json:"userPrincipalName" bson:"email"`
 	DisplayName string `json:"displayName" bson:"displayName"`

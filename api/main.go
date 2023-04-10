@@ -7,9 +7,11 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"independent-study-api/controllers"
-	ws2 "independent-study-api/internal/ws"
+	"independent-study-api/helper"
+	"independent-study-api/internal/ws"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func init() {
@@ -18,17 +20,6 @@ func init() {
 		fmt.Println(err)
 		log.Fatalf("Error loading .env file")
 	}
-}
-
-func serveWs(w http.ResponseWriter, r *http.Request) {
-
-	ws, err := ws2.Upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	go ws2.Writer(ws)
-	ws2.Reader(ws)
 }
 
 func main() {
@@ -50,7 +41,8 @@ func main() {
 	router.Get("/api/test", testHandler)
 	router.HandleFunc("/auth", controllers.MicrosoftLogin)
 	router.HandleFunc("/auth/ms", controllers.MicrosoftCallback)
-	//router.HandleFunc("/ws", serveWs)
+	router.Get("/auth/verify", verifyHandler)
+	router.HandleFunc("/ws:{room}:{player}", ws.ServeWs)
 
 	fmt.Println("Server listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", router))
@@ -60,7 +52,26 @@ func main() {
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
+func verifyHandler(w http.ResponseWriter, r *http.Request) {
+	authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer ")
+	if len(authHeader) != 2 {
+		w.WriteHeader(http.StatusUnauthorized)
+	} else {
+		userJSON, worked := helper.ParseToken(authHeader[1])
+		if worked {
+			err := json.NewEncoder(w).Encode(userJSON)
+			if err != nil {
+				fmt.Println("error main.go", err)
+				w.WriteHeader(http.StatusInternalServerError)
+			} else {
+				w.WriteHeader(http.StatusOK)
+			}
+		} else {
+			w.WriteHeader(http.StatusUnauthorized)
+		}
+	}
+}
 
 func postHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("You just sent me a post req!")
+	fmt.Println(chi.URLParam(r, "room"))
 }

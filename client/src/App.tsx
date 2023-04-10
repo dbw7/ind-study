@@ -9,6 +9,7 @@ import Homepage from './pages/Homepage/Homepage';
 import Login from './pages/Login/Login';
 import Navbar from './components/Navbar/Navbar';
 import Game from './pages/Game/Game';
+import CreateGame from './pages/CreateGame/CreateGame';
 
 const App: React.FC = ()  => {
   
@@ -22,6 +23,7 @@ const App: React.FC = ()  => {
       <Routes>
           <Route path='/' element={<Homepage />} />
           <Route path='/login' element={<Login />}/>
+          <Route path='/play' element={<CreateGame />}/>
           <Route path='/game' element={<Game />}/>
       </Routes>
     </div>
