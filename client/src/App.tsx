@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import './App.css'
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
 import CBoard from './components/ChessBoard/ChessBoard'
 import AuthContext from './context/auth-context'
@@ -22,8 +22,8 @@ const App: React.FC = ()  => {
       <Routes>
           <Route path='/' element={<Homepage />} />
           <Route path='/login' element={<Login />}/>
-          <Route path='/play' element={<CreateGame />}/>
-          <Route path='/game' element={<Game />}/>
+          {authCtx.isLoggedIn ? <Route path='/create-game' element={<CreateGame />}/> : <Route path='/create-game' element={<Navigate to="/login" replace />} />}
+          {authCtx.isLoggedIn ? <Route path='/game' element={<Game />}/> : <Route path='/game' element={<Navigate to="/login" replace />} />}
       </Routes>
     </div>
   )

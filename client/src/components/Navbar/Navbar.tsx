@@ -5,11 +5,13 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
+// @ts-ignore
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material';
+import { useNavigate } from 'react-router';
 
 const pages = ['Home', 'About', 'Play'];
 //const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -43,6 +45,8 @@ const StyledMenuIcon = styled(MenuIcon)(({ theme }) => ({
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  
+  const nav = useNavigate();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -76,15 +80,36 @@ function Navbar() {
           </Typography>
           
           <StyledBox sx={{ flexGrow: 1, display:"flex", justifyContent:"right" }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+          <Button
+                key={"Home"}
+                onClick={()=>{
+                  handleCloseNavMenu();
+                  nav("/")
+                }}
                 sx={buttonSX}
                >
-                {page}
+                {"Home"}
               </Button>
-            ))}
+              <Button
+                key={"About"}
+                onClick={()=>{
+                  handleCloseNavMenu()
+                  nav("/about")
+                }}
+                sx={buttonSX}
+               >
+                {"About"}
+              </Button>
+              <Button
+                key={"Play"}
+                onClick={()=>{
+                  handleCloseNavMenu()
+                  nav("/login")
+                }}
+                sx={buttonSX}
+               >
+                {"Play"}
+              </Button>
           </StyledBox>
           
           <Box sx={{ display: { xs: 'flex', md: 'none' }, marginLeft:"auto"}}>
