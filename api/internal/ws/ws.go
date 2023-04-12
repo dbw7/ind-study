@@ -37,7 +37,9 @@ type Game struct {
 	Fen                       string
 	EmailOfOneWhoMadeLastMove string
 
-	ExistsOrFull bool
+	DoesNotExistOrIsFull bool
+
+	Winner string
 }
 type wsPayload struct {
 	Game
@@ -99,7 +101,7 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 			go ListenForWs(&conn)
 		} else {
 			game := &Game{
-				ExistsOrFull: false,
+				DoesNotExistOrIsFull: true,
 			}
 			conn.WriteJSON(game)
 			conn.Close()

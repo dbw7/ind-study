@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Game from "../types/Game";
 import wsMove from "../types/Move";
 import { Chess, Move } from "chess.js";
+import { useNavigate } from "react-router-dom";
 
   
 const useWebsocket = (room:string, email:string) => {
@@ -15,6 +16,22 @@ const useWebsocket = (room:string, email:string) => {
     const [firstTurn, setFirstTurn] = useState<boolean>(true);
     const [fen, setFen] = useState<string>();
     const [lastResponseData, setLastResponseData] = useState<Game>();
+    const navigate = useNavigate();
+    
+    useEffect(()=>{
+        const possibleMoves = game.moves();
+        if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0){
+            let message = lastResponseData?.EmailOfOneWhoMadeLastMove + "won";
+          console.log("game is over");
+          window.alert(message)
+          if(socket){
+            let moveToSend:wsMove = JSON.parse(JSON.stringify(lastResponseData))
+            moveToSend.Winner = "true";
+            sendMsg(socket, moveToSend)
+          }
+        };
+    }, [game])
+    
     
     const  onDrop = (sourceSquare:any, targetSquare:any) => {
         const move = makeMove({
@@ -73,6 +90,9 @@ const useWebsocket = (room:string, email:string) => {
     const messageLogic = (socket:WebSocket) => {
         socket.onmessage = msg => {
           let data:Game = JSON.parse(msg.data);
+          if(data.DoesNotExistOrIsFull){
+            navigate('/game?room=null')
+          }
           console.log("the data", data)
           setRoomID(data.RoomID);
           if(data.Started){
@@ -96,7 +116,7 @@ const useWebsocket = (room:string, email:string) => {
         };
     }
     useEffect(()=>{
-        let ws = new WebSocket(`ws://10.138.20.97:8080/ws:${room}:${email}`);
+        let ws = new WebSocket(`ws://localhost:8080/ws:${room}:${email}`);
         ws.onopen = () => {
             console.log("Successfully Connected");
             setSocket(ws);

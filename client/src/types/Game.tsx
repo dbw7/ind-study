@@ -13,6 +13,8 @@ type Game = {
 	GetsFirstTurn: string,
 	Fen:           string,
 	EmailOfOneWhoMadeLastMove: string,
-	ExistsOrFull:  boolean,
+	DoesNotExistOrIsFull:  boolean,
+	
+	Winner: string,
 }
 export default Game;

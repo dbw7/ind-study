@@ -1,9 +1,10 @@
 import styled from "@emotion/styled";
 import { Button, ButtonProps, ThemeProvider, Typography, createTheme, responsiveFontSizes } from "@mui/material";
 import { purple } from "@mui/material/colors";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import "./Homepage.css"
 import { useNavigate } from "react-router";
+import AuthContext from "../../context/auth-context";
 
 let themex = createTheme();
 themex = responsiveFontSizes(themex);
@@ -18,6 +19,7 @@ const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
 
 const Homepage: FC = () => {
     const navigate = useNavigate();
+    const authCtx = useContext(AuthContext)
     return(
         <ThemeProvider theme={themex}>
             <div className="main-box flex-direction">
@@ -25,7 +27,11 @@ const Homepage: FC = () => {
                     <Typography fontFamily={"inter"} fontWeight="700" variant="h2" marginBottom="2rem">Chess.</Typography>
                     <Typography fontFamily={"inter"} sx={{color:"hsl(246,  6%, 55%)"}} marginBottom="1rem" variant="h5">With an over-engineered interface.</Typography>
                     <Typography fontFamily={"inter"} sx={{color:"hsl(246,  6%, 55%)"}} marginBottom="1rem" variant="h5">Built with complicated and powerful systems.</Typography>
-                    <ColorButton onClick={()=>{navigate('/login')}} className="button" sx={{width:"200px", borderRadius:"5px"}} variant="contained"><Typography fontFamily={"inter"} fontWeight="700" variant="h6">Play</Typography></ColorButton>
+                    <ColorButton onClick={()=>{
+                        if(authCtx.isLoggedIn){
+                            navigate("/create-game")
+                          } else {
+                            navigate("/login")} }} className="button" sx={{width:"200px", borderRadius:"5px"}} variant="contained"><Typography fontFamily={"inter"} fontWeight="700" variant="h6">Play</Typography></ColorButton>
                 </div>
                 <div className="image-div">
                     <img className="img" src="https://cdn-icons-png.flaticon.com/512/1366/1366540.png"></img>

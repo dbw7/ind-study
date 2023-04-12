@@ -12,6 +12,8 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material';
 import { useNavigate } from 'react-router';
+import AuthContext from '../../context/auth-context';
+import { Link } from 'react-router-dom';
 
 const pages = ['Home', 'About', 'Play'];
 //const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -45,6 +47,7 @@ const StyledMenuIcon = styled(MenuIcon)(({ theme }) => ({
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  const authCtx  = React.useContext(AuthContext);
   
   const nav = useNavigate();
 
@@ -61,11 +64,14 @@ function Navbar() {
       <Container maxWidth="lg">
         <Toolbar disableGutters>
           <img src='https://cdn-icons-png.flaticon.com/512/10281/10281803.png' width="50px"></img>
+          
+          <Link style={{
+            textDecoration: "none",
+            color: "white"
+          }} to='/'>
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="/"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'flex' },
@@ -78,6 +84,7 @@ function Navbar() {
           >
             DBChess
           </Typography>
+          </Link>
           
           <StyledBox sx={{ flexGrow: 1, display:"flex", justifyContent:"right" }}>
           <Button
@@ -104,7 +111,11 @@ function Navbar() {
                 key={"Play"}
                 onClick={()=>{
                   handleCloseNavMenu()
-                  nav("/login")
+                  if(authCtx.isLoggedIn){
+                    nav("/create-game")
+                  } else {
+                    nav("/login")
+                  }
                 }}
                 sx={buttonSX}
                >
