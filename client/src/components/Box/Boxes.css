@@ -34,15 +34,21 @@
 }
 @media (max-width: 1000px) {
     .room-box{
-        margin-top: 20%;
+        margin-top: 15%;
         width: 90vw;
         min-width: fit-content;
         height: fit-content;
+        padding: 2%;
     }
     .invalid-box{
         padding: 25px;
         height: fit-content;
         width: 80vw;
+    }
+}
+@media (max-width: 1000px) and (max-height:500px) {
+    .room-box{
+        margin-top: 3%;
     }
 }
 .code{

@@ -10,7 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import { styled } from '@mui/material';
+import { Icon, styled } from '@mui/material';
 import { useNavigate } from 'react-router';
 import AuthContext from '../../context/auth-context';
 import { Link } from 'react-router-dom';
@@ -43,6 +43,12 @@ const StyledMenuIcon = styled(MenuIcon)(({ theme }) => ({
     [theme.breakpoints.up(600)]: {
       display: "none",
     },
+}));
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  [theme.breakpoints.up(600)]: {
+    display: "none",
+  },
 }));
 
 function Navbar() {
@@ -123,8 +129,8 @@ function Navbar() {
               </Button>
           </StyledBox>
           
-          <Box sx={{ display: { xs: 'flex', md: 'none' }, marginLeft:"auto"}}>
-            <IconButton
+          <Box sx={{ display: { xs:'flex', md: 'none' }, marginLeft:"auto"}}>
+            <StyledIconButton
               size="large"
               aria-label="account of current user"
               aria-controls="menu-appbar"
@@ -133,7 +139,7 @@ function Navbar() {
               color="inherit"
             >
               <StyledMenuIcon />
-            </IconButton>
+            </StyledIconButton>
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}

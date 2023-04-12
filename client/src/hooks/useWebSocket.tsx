@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
   
 const useWebsocket = (room:string, email:string) => {
+    console.log("room in websocket", room)
     const [game, setGame] = useState<Chess>(new Chess());
     const [socket, setSocket] = useState<WebSocket | null>();
     const [roomID, setRoomID] = useState<string>("");
@@ -18,15 +19,21 @@ const useWebsocket = (room:string, email:string) => {
     const [lastResponseData, setLastResponseData] = useState<Game>();
     const navigate = useNavigate();
     
+    
     useEffect(()=>{
+      if(lastResponseData?.Winner){
+        let message = lastResponseData.EmailOfOneWhoMadeLastMove + " won!!!!!"
+        window.alert(message);
+      }
+    }, [lastResponseData])
+    
+    useEffect(()=>{
+        
         const possibleMoves = game.moves();
         if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0){
-            let message = lastResponseData?.EmailOfOneWhoMadeLastMove + "won";
-          console.log("game is over");
-          window.alert(message)
           if(socket){
             let moveToSend:wsMove = JSON.parse(JSON.stringify(lastResponseData))
-            moveToSend.Winner = "true";
+            moveToSend.Winner = true;
             sendMsg(socket, moveToSend)
           }
         };

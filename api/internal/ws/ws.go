@@ -39,7 +39,7 @@ type Game struct {
 
 	DoesNotExistOrIsFull bool
 
-	Winner string
+	Winner bool
 }
 type wsPayload struct {
 	Game
@@ -142,8 +142,11 @@ func ListenToWsChannel() {
 	var response wsJsonResponse
 	for {
 		event := <-wsChan
+		response = wsJsonResponse(event)
 		room := event.RoomID
 		fmt.Println("room", room)
+		fmt.Println("event data", event)
+		fmt.Println("response data", response)
 		conn1 := connections[room].P1Conn
 		conn2 := connections[room].P2Conn
 		response.Fen = event.Fen
