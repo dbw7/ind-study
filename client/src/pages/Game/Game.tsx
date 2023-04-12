@@ -13,10 +13,8 @@ const Game: FC = () => {
     let room = queryParams.get("room")
     
     return(
-        <div className="board-big">
-            <div className="board">
-                <ChessBoard room={room}></ChessBoard>
-            </div>
+        <div>
+            <ChessBoard room={room}></ChessBoard>
         </div>
     )
 }

@@ -18,36 +18,49 @@ var upgradeConnection = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
+type Game struct {
+	P1Email string
+	P2Email string
+
+	P1Name string
+	P2Name string
+
+	P1Conn WebSocketConnection
+	P2Conn WebSocketConnection
+
+	RoomID  string
+	Started bool
+
+	Locked                    bool
+	CurrentTurn               string
+	GetsFirstTurn             string
+	Fen                       string
+	EmailOfOneWhoMadeLastMove string
+
+	ExistsOrFull bool
+}
+type wsPayload struct {
+	Game
+}
+type wsJsonResponse struct {
+	Game
+}
 type WebSocketConnection struct {
 	*websocket.Conn
 }
 
-var wsChan = make(chan WsPayload)
+var wsChan = make(chan wsPayload)
 
 // var games = make(map[WebSocketConnection]*Game)
 var connections = make(map[string]*Game)
 
 var mu sync.Mutex
 
-type Game struct {
-	P1       string
-	P2       string
-	RoomID   string
-	P1Turn   bool
-	Started  bool
-	P1Conn   WebSocketConnection
-	P2Conn   WebSocketConnection
-	Locked   bool
-	WhosTurn string
-	First    string
-}
-
 func ServeWs(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgradeConnection.Upgrade(w, r, nil)
 
 	roomID := chi.URLParam(r, "room")
-	player := chi.URLParam(r, "player")
-	_ = player
+	playerEmail := chi.URLParam(r, "player")
 	fmt.Println(roomID)
 
 	if strings.Compare("initial", roomID) == 0 {
@@ -55,7 +68,7 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 		freshRoom := freshRoomID()
 		game := &Game{
 			RoomID:  freshRoom,
-			P1:      player,
+			P1Email: playerEmail,
 			P1Conn:  conn,
 			Started: false,
 			Locked:  false,
@@ -67,25 +80,28 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 		go ListenForWs(&conn)
 	} else {
 		conn := WebSocketConnection{Conn: ws}
-		if contains(connections, roomID) && len(connections[roomID].P2) == 0 {
-			connections[roomID].P2 = player
+		if contains(connections, roomID) && len(connections[roomID].P2Email) == 0 {
+			connections[roomID].P2Email = playerEmail
 			connections[roomID].P2Conn = conn
 			connections[roomID].Locked = true
 			connections[roomID].Started = true
 
-			if (rand.Intn(2) == 0) {
-				connections[roomID].First = connections[roomID].P2
-				connections[roomID].WhosTurn = connections[roomID].P2
+			if rand.Intn(2) == 0 {
+				connections[roomID].GetsFirstTurn = connections[roomID].P2Email
+				connections[roomID].CurrentTurn = connections[roomID].P2Email
 			} else {
-				connections[roomID].First = connections[roomID].P1
-				connections[roomID].WhosTurn = connections[roomID].P1
+				connections[roomID].GetsFirstTurn = connections[roomID].P1Email
+				connections[roomID].CurrentTurn = connections[roomID].P1Email
 			}
 
 			conn.WriteJSON(connections[roomID])
 			connections[roomID].P1Conn.WriteJSON(connections[roomID])
 			go ListenForWs(&conn)
 		} else {
-			conn.WriteJSON("Room is full or doesn't exist")
+			game := &Game{
+				ExistsOrFull: false,
+			}
+			conn.WriteJSON(game)
 			conn.Close()
 		}
 	}
@@ -99,24 +115,13 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type WsPayload struct {
-	Move    string              `json:"move"`
-	Fen     string              `json:"fen"`
-	Room    string              `json:"room"`
-	Action  string              `json:"action"`
-	Player  string              `json:"player"`
-	Email   string              `json:"email"`
-	Message string              `json:"message"`
-	Conn    WebSocketConnection `json:"-"`
-}
-
 func ListenForWs(conn *WebSocketConnection) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println("Error", fmt.Sprintf("%v", r))
 		}
 	}()
-	var payload WsPayload
+	var payload wsPayload
 	for {
 		err := conn.ReadJSON(&payload)
 		if err != nil {
@@ -125,42 +130,32 @@ func ListenForWs(conn *WebSocketConnection) {
 			break
 		} else {
 			fmt.Println("Payload", payload)
-			payload.Conn = *conn
 			//sends this to the websocket channel
 			wsChan <- payload
 		}
 	}
 }
 
-type WsJsonResponse struct {
-	Action       string
-	Message      string
-	MessageType  string
-	ReadyToStart bool
-	RoomID       string
-	WhosTurn     string
-	Fen          string
-	Started      bool
-	First        string
-}
-
 func ListenToWsChannel() {
-	var response WsJsonResponse
+	var response wsJsonResponse
 	for {
 		event := <-wsChan
-		room := event.Room
+		room := event.RoomID
 		fmt.Println("room", room)
 		conn1 := connections[room].P1Conn
 		conn2 := connections[room].P2Conn
 		response.Fen = event.Fen
 		response.Started = true
-		response.RoomID = event.Room
-		response.First = connections[room].First
-		if event.Email == connections[room].P1 {
-			response.WhosTurn = connections[room].P2
+		response.RoomID = event.RoomID
+		response.GetsFirstTurn = connections[room].GetsFirstTurn
+		response.EmailOfOneWhoMadeLastMove = event.EmailOfOneWhoMadeLastMove
+
+		if event.EmailOfOneWhoMadeLastMove == connections[room].P1Email {
+			response.CurrentTurn = connections[room].P2Email
 		} else {
-			response.WhosTurn = connections[room].P1
+			response.CurrentTurn = connections[room].P1Email
 		}
+
 		err := conn1.WriteJSON(response)
 		if err != nil {
 			log.Println("Websocket err")
@@ -169,9 +164,6 @@ func ListenToWsChannel() {
 		if err != nil {
 			log.Println("Websocket err")
 		}
-		//response.Action = "Got here"
-		//response.Message = fmt.Sprintf("Some message and action was %s", event.Action)
-		//broadCastToAll(response)
 	}
 }
 

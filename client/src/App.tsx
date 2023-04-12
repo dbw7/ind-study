@@ -1,8 +1,6 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import './App.css'
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-
-import CBoard from './components/ChessBoard/ChessBoard'
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthContext from './context/auth-context'
 import Homepage from './pages/Homepage/Homepage';
 import Login from './pages/Login/Login';
@@ -11,7 +9,6 @@ import Game from './pages/Game/Game';
 import CreateGame from './pages/CreateGame/CreateGame';
 
 const App: React.FC = ()  => {
-  
   const authCtx = useContext(AuthContext);
   
   return (

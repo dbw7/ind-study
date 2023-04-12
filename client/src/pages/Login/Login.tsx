@@ -78,6 +78,7 @@ const Login = () =>{
             }
             authCtx.current.login(token, userData);
             console.log("response json", userData)
+            navigate.current('/create-game');  
             
         })()
     }, [tokenParams, authCtx]);

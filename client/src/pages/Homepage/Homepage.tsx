@@ -3,6 +3,7 @@ import { Button, ButtonProps, ThemeProvider, Typography, createTheme, responsive
 import { purple } from "@mui/material/colors";
 import React, { FC } from "react";
 import "./Homepage.css"
+import { useNavigate } from "react-router";
 
 let themex = createTheme();
 themex = responsiveFontSizes(themex);
@@ -16,6 +17,7 @@ const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
 }));
 
 const Homepage: FC = () => {
+    const navigate = useNavigate();
     return(
         <ThemeProvider theme={themex}>
             <div className="main-box flex-direction">
@@ -23,7 +25,7 @@ const Homepage: FC = () => {
                     <Typography fontFamily={"inter"} fontWeight="700" variant="h2" marginBottom="2rem">Chess.</Typography>
                     <Typography fontFamily={"inter"} sx={{color:"hsl(246,  6%, 55%)"}} marginBottom="1rem" variant="h5">With an over-engineered interface.</Typography>
                     <Typography fontFamily={"inter"} sx={{color:"hsl(246,  6%, 55%)"}} marginBottom="1rem" variant="h5">Built with complicated and powerful systems.</Typography>
-                    <ColorButton className="button" sx={{width:"200px", borderRadius:"5px"}} variant="contained"><Typography fontFamily={"inter"} fontWeight="700" variant="h6">Play</Typography></ColorButton>
+                    <ColorButton onClick={()=>{navigate('/login')}} className="button" sx={{width:"200px", borderRadius:"5px"}} variant="contained"><Typography fontFamily={"inter"} fontWeight="700" variant="h6">Play</Typography></ColorButton>
                 </div>
                 <div className="image-div">
                     <img className="img" src="https://cdn-icons-png.flaticon.com/512/1366/1366540.png"></img>

@@ -1,9 +1,5 @@
-type CMove = {
-    room: string,
-    player: string,
-    move: string | null,
-    fen: string,
-    email: string,
-};
+import Game from "./Game";
 
-export default CMove;
+type wsMove = Game;
+
+export default wsMove;

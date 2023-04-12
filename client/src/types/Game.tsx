@@ -1,12 +1,18 @@
 type Game = {
-	P1:      string,
-	P2 :     string,
+	P1Email: string,
+	P2Email: string,
+
+	P1Name: string,
+	P2Name: string,
+	
 	RoomID:  string,
-	P1Turn : boolean,
 	Started: boolean,
-	Locked : boolean,
-    WhosTurn: string,
-    Fen:       string,
-	First:     string,
+
+	Locked:       boolean,
+	CurrentTurn:   string,
+	GetsFirstTurn: string,
+	Fen:           string,
+	EmailOfOneWhoMadeLastMove: string,
+	ExistsOrFull:  boolean,
 }
 export default Game;
