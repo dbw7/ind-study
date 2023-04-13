@@ -18,7 +18,8 @@ func CreateToken(sub string, userInfo db.MicrosoftUser) (string, bool) {
 	// Get the token instance with the Signing method
 	token := jwt.New(jwt.GetSigningMethod("HS256"))
 	// Choose an expiration time. Shorter the better
-	exp := time.Now().Add(time.Hour * 24)
+	exp := time.Now().Add(time.Hour * 24 * 3)
+	//exp := time.Now().Add(time.Second * 1)
 	// Add your claims
 	token.Claims = &JWTClaims{
 		userInfo,

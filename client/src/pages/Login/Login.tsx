@@ -36,6 +36,7 @@ const Login = () =>{
         }
     }
     const [failedAuth, setFailedAuth] = useState(false);
+    const [relogin, setRelogin] = useState(false);
     const [error, setError] = useState(false);
     
     
@@ -47,6 +48,12 @@ const Login = () =>{
     useEffect(() => {
         if(tokenParams.get("failed")){
             setFailedAuth(true);
+        }
+        if(tokenParams.get("message") === "error"){
+            setError(true);
+        }
+        if(tokenParams.get("message") === "relogin"){
+            setRelogin(true);
         }
     }, [tokenParams]);
     
@@ -89,6 +96,7 @@ const Login = () =>{
                 {!isLoading ? <MicrosoftLoginButton onClick={loginHandler}></MicrosoftLoginButton> : <></>}
                 {failedAuth && <Typography variant="h6" sx={{width:"50vw", textAlign:"center", position:"absolute", right:"25%", color:"white",fontFamily: "inter", fontWeight: "500",}}>You are not in the @villanova.edu domain and have not been authorized.<br></br><br></br>If this is an error, contact me using the button below.</Typography>}
                 {error && <Typography variant="h6" sx={{width:"50vw", textAlign:"center", position:"absolute", right:"25%", color:"white",fontFamily: "inter", fontWeight: "500",}}>There has been an error, please try again.<br></br><br></br>If this continues, try again later.</Typography>}
+                {relogin && <Typography variant="h6" sx={{width:"50vw", textAlign:"center", position:"absolute", right:"25%", color:"white",fontFamily: "inter", fontWeight: "500",}}>Your session has expired.<br></br><br></br>Please log in again.</Typography>}
             </div>
         </div>
     )

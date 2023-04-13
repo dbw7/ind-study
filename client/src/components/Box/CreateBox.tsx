@@ -5,7 +5,7 @@ import { Button, ButtonProps, ThemeProvider, Typography, styled, TextField, crea
 
 const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
     //backgroundImage: "linear-gradient( 99deg,  rgba(115,18,81,1) 10.6%, rgba(28,28,28,1) 118% )",
-    marginTop: "1rem",
+    marginTop: "1.7rem",
     background: "transparent",
     borderWidth: "2px",
     fontFamily: "inter",
@@ -67,7 +67,7 @@ const CreateBox = () => {
     }
     
     const handleTextInputChange = (event:BaseSyntheticEvent) => {
-        console.log(event.target.value.length);
+        //console.log(event.target.value.length);
         if(event.target.value.length === 3){
             setStarted(true);
         }

@@ -31,7 +31,7 @@ const ChessBoard = (props:props) => {
         {gameStarted && 
         <>
           {firstTurn ? playerNames.b : playerNames.w}
-          <Chessboard  boardOrientation={firstTurn ? "white" : "black"} position={game.fen()} onPieceDrop={onDrop} />
+          <Chessboard  boardOrientation={firstTurn ? "white" : "black"} position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={winner.length < 2} />
           {firstTurn ? playerNames.w : playerNames.b}
         </>}
       </div>

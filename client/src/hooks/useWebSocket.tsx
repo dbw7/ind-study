@@ -43,7 +43,7 @@ const useWebsocket = (room:string, email:string) => {
     }, [game])
     
     
-    const  onDrop = (sourceSquare:any, targetSquare:any) => {
+    const onDrop = (sourceSquare:any, targetSquare:any) => {
         const move = makeMove({
             from: sourceSquare,
             to: targetSquare,
@@ -78,19 +78,19 @@ const useWebsocket = (room:string, email:string) => {
     moveToSend.RoomID = roomID
     moveToSend.Fen = gameCopy.fen()
     moveToSend.EmailOfOneWhoMadeLastMove = email;
-    console.log("sent data", moveToSend)
+    //console.log("sent data", moveToSend)
     sendMsg(socket, moveToSend)
     setMyTurn(false);
     //socket.send(JSON.stringify(moveToSend))
     //sendMsg(socket, moveToSend)
     setGame(gameCopy);
-    console.log("Game Fen 64", game.fen());
+    //console.log("Game Fen 64", game.fen());
   }
   
   
     useEffect(()=>{
-        console.log("fen line 18", fen)
-        console.log("my turn in fen", myTurn)
+        //console.log("fen line 18", fen)
+        //console.log("my turn in fen", myTurn)
         if(fen){
           const chess = new Chess(fen)
           setGame(chess);
@@ -124,7 +124,7 @@ const useWebsocket = (room:string, email:string) => {
             }
             setFen(data.Fen);
             setLastResponseData(data);
-            console.log("last response data", lastResponseData)
+            //console.log("last response data", lastResponseData)
           } else {
             return
           }
@@ -158,7 +158,7 @@ const useWebsocket = (room:string, email:string) => {
 }
 
 const sendMsg = (socket:WebSocket, move: wsMove) => {
-    console.log("sending")
+    //console.log("sending")
     try {
       socket.send(JSON.stringify(move));
     } catch (error) {

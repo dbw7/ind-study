@@ -5,10 +5,12 @@ import "./Game.css"
 import ChessBoard from "../../components/ChessBoard/ChessBoard";
 import AuthContext from "../../context/auth-context";
 import { useSearchParams } from "react-router-dom";
+import useBackendTester from "../../hooks/useBackendTester";
 
 
 const Game: FC = () => {
     // @ts-ignore
+    useBackendTester();
     const [queryParams] = useSearchParams();
     let roomQuery = queryParams.get("room");
     
