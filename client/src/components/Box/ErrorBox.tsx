@@ -1,5 +1,5 @@
 import React from "react";
-import './Boxes.css';
+import './ErrorBox.css';
 import { useNavigate } from "react-router-dom";
 import { Button, ButtonProps, ThemeProvider, Typography, styled, TextField, createTheme, responsiveFontSizes} from "@mui/material";
 
@@ -23,7 +23,7 @@ const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
     }
 }));
 
-const InvalidBox = () => {
+const ErrorBox = () => {
     const navigate = useNavigate();
     const buttonHandler = () => {
         navigate('/create-game')
@@ -31,14 +31,14 @@ const InvalidBox = () => {
     
     return( 
         <>
-            <div className="invalid-box">
+            <div className="error-box">
                 <div style={{textAlign:"center"}}>
-                    <Typography  color="#e9b14a" fontFamily={"inter"} fontWeight="700" variant="h4">The room you tried to access is full or doesn't exist.</Typography>
+                    <Typography  color="#ff0000" fontFamily={"inter"} fontWeight="700" variant="h4">Error creating or connecting to game.</Typography>
                     <br></br>
                     <br></br>
                     <br></br>
                     <div className="code">
-                        <Typography  color="#e9b14a" fontFamily={"inter"} fontWeight="700" variant="h4" >Want to start a game? Click here.</Typography>
+                        <Typography  color="white" fontFamily={"inter"} fontWeight="700" variant="h4" >Try starting a game again? Click here.</Typography>
                     </div>
                     <br></br>
                     <ColorButton variant="outlined" onClick={buttonHandler}  >Create Game</ColorButton>
@@ -49,4 +49,4 @@ const InvalidBox = () => {
     
 }
 
-export default InvalidBox;
+export default ErrorBox;

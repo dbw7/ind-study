@@ -136,6 +136,7 @@ const useWebsocket = (room:string, email:string) => {
             console.log("Successfully Connected");
             setSocket(ws);
             messageLogic(ws);
+            setError(false);
         };
         ws.onclose = event => {
             console.log("Socket Closed Connection: ", event);
@@ -145,6 +146,7 @@ const useWebsocket = (room:string, email:string) => {
             console.log("Socket Error: ", error);
             setSocket(null);
             setError(true);
+            setGameStarted(false);
         };
         return () => {
             ws.close();
