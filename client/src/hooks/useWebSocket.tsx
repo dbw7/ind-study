@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
   
 const useWebsocket = (room:string, email:string) => {
-    console.log("room in websocket", room)
+    const [playerNames, setPlayerNames] = useState({w: "", b: ""});
     const [game, setGame] = useState<Chess>(new Chess());
     const [socket, setSocket] = useState<WebSocket | null>();
     const [roomID, setRoomID] = useState<string>("");
@@ -17,25 +17,28 @@ const useWebsocket = (room:string, email:string) => {
     const [firstTurn, setFirstTurn] = useState<boolean>(true);
     const [fen, setFen] = useState<string>();
     const [lastResponseData, setLastResponseData] = useState<Game>();
+    const [winner, setWinner] = useState<string>("");
     const navigate = useNavigate();
     
     
     useEffect(()=>{
-      if(lastResponseData?.Winner){
-        let message = lastResponseData.EmailOfOneWhoMadeLastMove + " won!!!!!"
-        window.alert(message);
+      if(lastResponseData?.SomeoneWon){
+        let message;
+        lastResponseData.EmailOfOneWhoMadeLastMove == lastResponseData.P1Email ? message = lastResponseData.P1Name + " won!!!!!" : message = lastResponseData.P2Name + " won!!!!"
+        setWinner(message);
+        setRoomID("");
       }
     }, [lastResponseData])
     
     useEffect(()=>{
-        
+        if(!gameStarted || !myTurn || !socket || lastResponseData?.SomeoneWon){
+          return
+        }
         const possibleMoves = game.moves();
         if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0){
-          if(socket){
-            let moveToSend:wsMove = JSON.parse(JSON.stringify(lastResponseData))
-            moveToSend.Winner = true;
-            sendMsg(socket, moveToSend)
-          }
+          let moveToSend:wsMove = JSON.parse(JSON.stringify(lastResponseData))
+          moveToSend.SomeoneWon = true;
+          sendMsg(socket, moveToSend)
         };
     }, [game])
     
@@ -102,8 +105,13 @@ const useWebsocket = (room:string, email:string) => {
           }
           console.log("the data", data)
           setRoomID(data.RoomID);
-          if(data.Started){
+          if(data.Started && !gameStarted){
             setGameStarted(true);
+            
+            let w = data.GetsFirstTurn == data.P1Email ? data.P1Name : data.P2Name;
+            let b = data.GetsFirstTurn == data.P1Email ? data.P2Name : data.P1Name;
+            setPlayerNames({w: w, b: b});
+            
             if(data.GetsFirstTurn == email){
                 setFirstTurn(true);
             } else {
@@ -143,7 +151,7 @@ const useWebsocket = (room:string, email:string) => {
             setSocket(null);
         };
       }, [])
-    return {game, socket, roomID, error, errorMessage, gameStarted, firstTurn, onDrop}
+    return {game, socket, roomID, error, errorMessage, gameStarted, firstTurn, onDrop, winner, playerNames}
   
 }
 

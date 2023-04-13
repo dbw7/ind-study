@@ -1,9 +1,27 @@
 import React from "react";
-import { Typography } from "@mui/material";
-import ColorButton from "../ColorButton/ColorButton";
 import './Boxes.css';
 import { useNavigate } from "react-router-dom";
+import { Button, ButtonProps, ThemeProvider, Typography, styled, TextField, createTheme, responsiveFontSizes} from "@mui/material";
 
+const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
+    //backgroundImage: "linear-gradient( 99deg,  rgba(115,18,81,1) 10.6%, rgba(28,28,28,1) 118% )",
+    marginTop: "1rem",
+    background: "transparent",
+    borderWidth: "2px",
+    fontFamily: "inter",
+    fontWeight: "700",
+    fontSize: "1.2rem",
+    borderColor: "#978bf9",
+    color: "#978bf9",
+    '&:hover': {
+        // fontFamily: "inter",
+        borderWidth: "2px",
+        borderColor: "white",
+        color: "white",
+        background: "transparent",
+        // backgroundImage: "linear-gradient( 99deg,  rgba(115,18,81,1) 10.6%, rgba(28,28,28,1) 118% )"
+    }
+}));
 
 const InvalidBox = () => {
     const navigate = useNavigate();
@@ -23,7 +41,7 @@ const InvalidBox = () => {
                         <Typography  color="#e9b14a" fontFamily={"inter"} fontWeight="700" variant="h4" >Want to start a game? Click here.</Typography>
                     </div>
                     <br></br>
-                    <ColorButton buttonFunc={buttonHandler} buttonText="Create Game" />
+                    <ColorButton variant="outlined" onClick={buttonHandler}  >Create Game</ColorButton>
                 </div>
             </div>
         </>

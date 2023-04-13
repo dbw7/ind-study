@@ -15,6 +15,6 @@ type Game = {
 	EmailOfOneWhoMadeLastMove: string,
 	DoesNotExistOrIsFull:  boolean,
 	
-	Winner: boolean,
+	SomeoneWon: boolean,
 }
 export default Game;

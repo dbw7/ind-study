@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -82,5 +83,16 @@ func FindOrCreateUser(user MicrosoftUser) bool {
 	} else {
 		return true
 	}
+}
 
+func GetUsersName(userEmail string) string {
+	var user MicrosoftUser
+	err := UserCollection.FindOne(Ctx, bson.M{"email": userEmail}).Decode(&user)
+	fmt.Println("User", user, userEmail)
+	if err != nil {
+		fmt.Println("Error getting user name", err)
+		return ""
+	} else {
+		return user.DisplayName
+	}
 }

@@ -11,28 +11,27 @@ import RoomBox from "../Box/RoomBox";
 interface props {
   room: string;
 }
-const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  //backgroundImage: "linear-gradient( 99deg,  rgba(115,18,81,1) 10.6%, rgba(28,28,28,1) 118% )",
-  backgroundImage: "linear-gradient( 83.2deg,  rgba(150,93,233,1) 10.8%, rgba(99,88,238,1) 94.3% )",
-  '&:hover': {
-      backgroundImage: "linear-gradient( 99deg,  rgba(115,18,81,1) 10.6%, rgba(28,28,28,1) 118% )"
-  },
-}));
 
 const ChessBoard = (props:props) => { 
   const authCtx = useContext(AuthContext); 
-  const {game, firstTurn, onDrop, gameStarted, roomID} = useWebsocket(props.room, authCtx.userData.email)
+  const {game, firstTurn, onDrop, gameStarted, roomID, winner, playerNames} = useWebsocket(props.room, authCtx.userData.email)
   
   useEffect(()=>{
-    console.log("this fired", props.room)
-  }, [props.room])
+    console.log("playernames", playerNames)
+  }, [props.room, gameStarted, playerNames])
   
   return (
     <>
+    <Typography variant="h1">{winner}</Typography>
     {(!props.room || (props.room.length != 3 && props.room != "initial") || props.room == "null") && <InvalidBox></InvalidBox>}
       {(roomID && !gameStarted) && <RoomBox roomID={roomID}/>}
       <div className="board">
-        {gameStarted && <Chessboard  boardOrientation={firstTurn ? "white" : "black"} position={game.fen()} onPieceDrop={onDrop} />}
+        {gameStarted && 
+        <>
+          {firstTurn ? playerNames.b : playerNames.w}
+          <Chessboard  boardOrientation={firstTurn ? "white" : "black"} position={game.fen()} onPieceDrop={onDrop} />
+          {firstTurn ? playerNames.w : playerNames.b}
+        </>}
       </div>
     </>
   )

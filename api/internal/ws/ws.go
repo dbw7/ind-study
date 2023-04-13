@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
 	"independent-study-api/helper"
+	"independent-study-api/internal/db"
 	"log"
 	"math/rand"
 	"net/http"
@@ -39,7 +40,7 @@ type Game struct {
 
 	DoesNotExistOrIsFull bool
 
-	Winner bool
+	SomeoneWon bool
 }
 type wsPayload struct {
 	Game
@@ -68,12 +69,14 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 	if strings.Compare("initial", roomID) == 0 {
 		conn := WebSocketConnection{Conn: ws}
 		freshRoom := freshRoomID()
+		p1Name := db.GetUsersName(playerEmail)
 		game := &Game{
 			RoomID:  freshRoom,
 			P1Email: playerEmail,
 			P1Conn:  conn,
 			Started: false,
 			Locked:  false,
+			P1Name:  p1Name,
 		}
 		connections[freshRoom] = game
 		conn.WriteJSON("You made a new room, id is")
@@ -83,11 +86,12 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 	} else {
 		conn := WebSocketConnection{Conn: ws}
 		if contains(connections, roomID) && len(connections[roomID].P2Email) == 0 {
+			p2Name := db.GetUsersName(playerEmail)
 			connections[roomID].P2Email = playerEmail
 			connections[roomID].P2Conn = conn
 			connections[roomID].Locked = true
 			connections[roomID].Started = true
-
+			connections[roomID].P2Name = p2Name
 			if rand.Intn(2) == 0 {
 				connections[roomID].GetsFirstTurn = connections[roomID].P2Email
 				connections[roomID].CurrentTurn = connections[roomID].P2Email
@@ -168,6 +172,11 @@ func ListenToWsChannel() {
 		err = conn2.WriteJSON(response)
 		if err != nil {
 			log.Println("Websocket err")
+		}
+		if event.SomeoneWon {
+			connections[room].P1Conn.Close()
+			connections[room].P2Conn.Close()
+			delete(connections, room)
 		}
 	}
 }

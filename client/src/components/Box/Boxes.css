@@ -31,7 +31,10 @@
     border-color: #e9b14a;
     border-style: solid;
     box-shadow: #e9b14a;
+    min-height: fit-content;
+    padding: 2%;
 }
+
 @media (max-width: 1000px) {
     .room-box{
         margin-top: 15%;
@@ -51,14 +54,19 @@
         margin-top: 3%;
     }
 }
+@media (max-height:753px) {
+    .invalid-box{
+        height: fit-content;
+    }
+}
+@media (min-width:1000px) and (max-height:560px) {
+    .room-box{
+        height: fit-content;
+    }
+}
 .code{
     width: fit-content;
     margin: auto;
     border: 5px;
     border: thick;
-}
-
-.board{
-    max-width: 50%;
-    margin: auto;
 }
