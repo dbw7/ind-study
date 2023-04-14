@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Game from "../types/Game";
 import wsMove from "../types/Move";
-import { Chess, Move } from "chess.js";
+import { Chess } from "chess.js";
 import { useNavigate } from "react-router-dom";
+import { AuthContextType } from "../context/auth-context";
 
   
-const useWebsocket = (room:string, email:string) => {
+const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     const [playerNames, setPlayerNames] = useState({w: "", b: ""});
     const [game, setGame] = useState<Chess>(new Chess());
     const [socket, setSocket] = useState<WebSocket | null>();
@@ -18,10 +19,11 @@ const useWebsocket = (room:string, email:string) => {
     const [fen, setFen] = useState<string>();
     const [lastResponseData, setLastResponseData] = useState<Game>();
     const [winner, setWinner] = useState<string>("");
+    
     const navigate = useNavigate();
     
-    
     useEffect(()=>{
+      //console.log(lastResponseData, "29292929")
       if(lastResponseData?.SomeoneWon){
         let message;
         lastResponseData.EmailOfOneWhoMadeLastMove == lastResponseData.P1Email ? message = lastResponseData.P1Name + " won!!!!!" : message = lastResponseData.P2Name + " won!!!!"
@@ -99,11 +101,24 @@ const useWebsocket = (room:string, email:string) => {
     
     const messageLogic = (socket:WebSocket) => {
         socket.onmessage = msg => {
-          let data:Game = JSON.parse(msg.data);
+          let data1 = JSON.parse(msg.data);
+          if(data1.noJoin){
+            console.log("noJoin", data1.noJoin)
+            return
+          }
+          if(data1.tookTooLong){
+            let message;
+            data1.tookTooLong == data1.P1Email ? message = data1.P2Name + " won!!!!!" : message = data1.P1Name + " won!!!!"
+            setWinner(message);
+            setRoomID("");
+            console.log("this player took too long", data1.tookTooLong)
+            return
+          }
+          let data:Game = data1;
           if(data.DoesNotExistOrIsFull){
             navigate('/game?room=null')
           }
-          console.log("the data", data)
+          //console.log("the data", data)
           setRoomID(data.RoomID);
           if(data.Started && !gameStarted){
             setGameStarted(true);
@@ -131,6 +146,10 @@ const useWebsocket = (room:string, email:string) => {
         };
     }
     useEffect(()=>{
+        if(!authCtx.isLoggedIn){
+          navigate('/login')
+          return
+        }
         let ws = new WebSocket(`ws://localhost:8080/ws:${room}:${email}`);
         ws.onopen = () => {
             console.log("Successfully Connected");
@@ -149,6 +168,7 @@ const useWebsocket = (room:string, email:string) => {
             setGameStarted(false);
         };
         return () => {
+            //console.log("remounting");
             ws.close();
             setSocket(null);
         };

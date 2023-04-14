@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const useBackendTester = () => {
     const authCtx = useContext(AuthContext);
     const navigate = useNavigate();
-    
+    //console.log("verify handler")
     useEffect(() => {
         (async () =>{
             try {
@@ -16,6 +16,7 @@ const useBackendTester = () => {
                     'Authorization': "Bearer " + authCtx.token
                 }
             });
+            //console.log("response", response.status)
             if (response.status  === 401){
                 authCtx.logout();
                 navigate("/login?message=relogin");
