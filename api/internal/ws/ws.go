@@ -96,8 +96,8 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 		handleContext(ctx, conn, connections[freshRoom])
 	} else {
 		conn := WebSocketConnection{Conn: ws}
-		connections[roomID].mu.Lock()
 		if contains(connections, roomID) && len(connections[roomID].P2Email) == 0 {
+			connections[roomID].mu.Lock()
 			p2Name := db.GetUsersName(playerEmail)
 			connections[roomID].P2Email = playerEmail
 			connections[roomID].P2Conn = conn
@@ -114,7 +114,7 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 
 			conn.WriteJSON(connections[roomID])
 			connections[roomID].P1Conn.WriteJSON(connections[roomID])
-
+			connections[roomID].mu.Unlock()
 			go ListenForWs(&conn, connections[roomID])
 		} else {
 			game := &Game{
@@ -125,9 +125,8 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 			}
 			conn.WriteJSON(game)
 			conn.Close()
-			delete(connections, game.RoomID)
 		}
-		connections[roomID].mu.Unlock()
+
 	}
 
 	if err != nil {
@@ -153,6 +152,16 @@ func ListenForWs(conn *WebSocketConnection, game *Game) {
 		err := conn.ReadJSON(&payload)
 		if err != nil {
 			//do nothing, there is no payload
+			if websocket.IsCloseError(err, websocket.CloseNoStatusReceived, websocket.CloseGoingAway) {
+				fmt.Println("game", game)
+				fmt.Printf("%+v\n", game)
+				if *conn == game.P1Conn && !game.Started {
+					fmt.Println("it is player 1's connection")
+				}
+				//else if &game.P2Conn != nil && *conn == game.P2Conn {
+				//	fmt.Println("it is player 2's connection")
+				//}
+			}
 			fmt.Println("error", err)
 			break
 		} else {
@@ -171,6 +180,10 @@ func ListenToWsChannel() {
 		response = wsJsonResponse(event)
 		room := event.RoomID
 		fmt.Println("room", room)
+		if connections[room] == nil {
+			fmt.Println("Connection closed unexpectedly", event)
+			return
+		}
 		connections[room].mu.Lock()
 		fmt.Println("event data", event)
 		fmt.Println("response data", response)
@@ -251,7 +264,7 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 			delete(connections, game.RoomID)
 			return
 		case <-timeoutTimer.C:
-			game.mu.Lock()
+			mu.Lock()
 			if !game.Started {
 				//game.P1Conn.WriteMessage(websocket.TextMessage, []byte("Second player hasn't joined"))
 				game.P1Conn.WriteJSON(map[string]interface{}{
@@ -279,7 +292,7 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 				game.P2Conn.Close()
 				delete(connections, game.RoomID)
 			}
-			game.mu.Unlock()
+			mu.Unlock()
 		case <-game.MsgChan:
 			if !timeoutTimer.Stop() {
 				<-timeoutTimer.C

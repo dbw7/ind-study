@@ -1,5 +1,5 @@
 import "./CreateGame.css"
-import CreateBox from "../../components/Box/CreateBox";
+import CreateBox from "../../components/Box/CreateBox/CreateBox";
 import { FC } from "react";
 import useBackendTester from "../../hooks/useBackendTester";
 

@@ -19,7 +19,8 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     const [fen, setFen] = useState<string>();
     const [lastResponseData, setLastResponseData] = useState<Game>();
     const [winner, setWinner] = useState<string>("");
-    
+    const [noJoin, setNoJoin] = useState<boolean>(false);
+	
     const navigate = useNavigate();
     
     useEffect(()=>{
@@ -104,6 +105,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
           let data1 = JSON.parse(msg.data);
           if(data1.noJoin){
             console.log("noJoin", data1.noJoin)
+			setNoJoin(true);
             return
           }
           if(data1.tookTooLong){
@@ -173,7 +175,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
             setSocket(null);
         };
       }, [])
-    return {game, socket, roomID, error, errorMessage, gameStarted, firstTurn, onDrop, winner, playerNames}
+    return {game, socket, roomID, error, errorMessage, gameStarted, firstTurn, onDrop, winner, playerNames, noJoin}
   
 }
 
