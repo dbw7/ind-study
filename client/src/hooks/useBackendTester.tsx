@@ -29,7 +29,7 @@ const useBackendTester = () => {
                 navigate("/login?message=error");
             }
         })()
-    });
+    }, []);
 }
 
 export default useBackendTester;

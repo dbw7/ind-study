@@ -18,6 +18,9 @@ type MicrosoftUser struct {
 	// Mail        string `json:"mail"`
 	Email       string `json:"userPrincipalName" bson:"email"`
 	DisplayName string `json:"displayName" bson:"displayName"`
+	Rating      int    `json:"rating" bson:"rating"`
+	Wins        int    `json:"wins" bson:"wins"`
+	Losses      int    `json:"losses" bson:"losses"`
 }
 
 var (

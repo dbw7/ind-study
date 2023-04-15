@@ -81,7 +81,10 @@ const Login = () =>{
             const userData:UserData = {
                 email: responseJSON.userPrincipalName,
                 name: responseJSON.displayName,
-                userId: responseJSON.ID
+                userId: responseJSON.ID,
+                rating: responseJSON.rating,
+                wins: responseJSON.wins,
+                losses: responseJSON.losses,
             }
             authCtx.current.login(token, userData);
             console.log("response json", userData)

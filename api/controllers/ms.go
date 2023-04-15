@@ -102,6 +102,11 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	}
 	//fmt.Println(user)
 	_, existsInDbAlready := db.FindUser(user)
+	if !existsInDbAlready {
+		user.Rating = 1200
+		user.Wins = 0
+		user.Losses = 0
+	}
 	userCreated := db.FindOrCreateUser(user)
 	_ = userCreated
 	tokenString, worked := helper.CreateToken("", user)

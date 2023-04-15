@@ -34,19 +34,19 @@ const buttonSX  = {
 };
 
 const StyledBox = styled(Box)(({ theme }) => ({
-    [theme.breakpoints.down(600)]: {
+    [theme.breakpoints.down(651)]: {
       display: "none"
     }
 }));
 
 const StyledMenuIcon = styled(MenuIcon)(({ theme }) => ({
-    [theme.breakpoints.up(600)]: {
+    [theme.breakpoints.up(651)]: {
       display: "none",
     },
 }));
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  [theme.breakpoints.up(600)]: {
+  [theme.breakpoints.up(651)]: {
     display: "none",
   },
 }));
@@ -126,6 +126,44 @@ function Navbar() {
                 sx={buttonSX}
                >
                 {"Play"}
+              </Button>
+              <Button
+                key={"profile"}
+                onClick={()=>{
+                  handleCloseNavMenu()
+                  if(authCtx.isLoggedIn){
+                    nav("/profile")
+                  } else {
+                    nav("/login")
+                  }
+                }}
+                sx={buttonSX}
+               >
+                {"Profile"}
+              </Button>
+              <Button
+                key={"leaderboard"}
+                onClick={()=>{
+                  handleCloseNavMenu()
+                  if(authCtx.isLoggedIn){
+                    nav("/leaderboard")
+                  } else {
+                    nav("/login")
+                  }
+                }}
+                sx={buttonSX}
+               >
+                {"LeaderBoard"}
+              </Button>
+              <Button
+                key={"Play"}
+                onClick={()=>{
+                  handleCloseNavMenu()
+                  authCtx.logout();
+                }}
+                sx={buttonSX}
+               >
+                {"Logout"}
               </Button>
           </StyledBox>
           

@@ -58,6 +58,7 @@ func verifyHandler(w http.ResponseWriter, r *http.Request) {
 	authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer ")
 	if len(authHeader) != 2 {
 		w.WriteHeader(http.StatusUnauthorized)
+		return
 	} else {
 		userJSON, worked := helper.ParseToken(authHeader[1])
 		if worked {
@@ -65,11 +66,14 @@ func verifyHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println("error main.go", err)
 				w.WriteHeader(http.StatusInternalServerError)
+				return
 			} else {
-				w.WriteHeader(http.StatusOK)
+				//w.WriteHeader(http.StatusOK)
+				return
 			}
 		} else {
 			w.WriteHeader(http.StatusUnauthorized)
+			return
 		}
 	}
 }

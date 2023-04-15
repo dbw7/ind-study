@@ -1,0 +1,27 @@
+.profile{
+    height: calc(100vh - 220px);
+    height: -o-calc(100% - 220px); /* opera */
+    height: -webkit-calc(100% - 220px); /* google, safari */
+    height: -moz-calc(100% - 220px); /* firefox */
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.profile-inner{
+    width: 80vw;
+    height: 45vh;
+    /* overflow-x: auto; */
+    margin-top: 2rem;
+    background-color: #1b1e2473;
+    border-radius: 5px;
+    border-color: #96a6b557;
+    border-style: solid;
+    min-width: fit-content;
+}
+.stats{
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 4rem;
+}

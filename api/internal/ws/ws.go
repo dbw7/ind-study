@@ -157,6 +157,10 @@ func ListenForWs(conn *WebSocketConnection, game *Game) {
 				fmt.Printf("%+v\n", game)
 				if *conn == game.P1Conn && !game.Started {
 					fmt.Println("it is player 1's connection")
+					conn.Close()
+					mu.Lock()
+					delete(connections, game.RoomID)
+					mu.Unlock()
 				}
 				//else if &game.P2Conn != nil && *conn == game.P2Conn {
 				//	fmt.Println("it is player 2's connection")

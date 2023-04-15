@@ -1,5 +1,5 @@
 import { Button, ButtonProps, styled, } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({
     //backgroundImage: "linear-gradient( 99deg,  rgba(115,18,81,1) 10.6%, rgba(28,28,28,1) 118% )",
@@ -27,9 +27,15 @@ interface props {
 
 const CreateGameButton = (props: props) => {
     const navigate = useNavigate();
+    const [queryParams] = useSearchParams();
+    let roomQuery = queryParams.get("room");
     
     const buttonHandler = () => {
-        navigate('/create-game')
+        if(roomQuery){
+            window.location.href = "/game?room=initial";
+        } else {
+            navigate('/game?room=initial')
+        }
     }
     
     return(
