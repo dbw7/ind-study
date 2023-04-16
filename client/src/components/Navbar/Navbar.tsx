@@ -156,7 +156,7 @@ function Navbar() {
                 {"LeaderBoard"}
               </Button>
               <Button
-                key={"Play"}
+                key={"Logout"}
                 onClick={()=>{
                   handleCloseNavMenu()
                   authCtx.logout();

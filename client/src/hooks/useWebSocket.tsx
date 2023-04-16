@@ -11,7 +11,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     const [game, setGame] = useState<Chess>(new Chess());
     const [socket, setSocket] = useState<WebSocket | null>();
     const [roomID, setRoomID] = useState<string>("");
-    const [error, setError] = useState<boolean>(false);
+    const [err, setError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [myTurn, setMyTurn] = useState<boolean>(false);
     const [gameStarted, setGameStarted] = useState<boolean>(false);
@@ -24,10 +24,10 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     const navigate = useNavigate();
     
     useEffect(()=>{
-      //console.log(lastResponseData, "29292929")
+      console.log(lastResponseData, "29292929")
       if(lastResponseData?.SomeoneWon){
         let message;
-        lastResponseData.EmailOfOneWhoMadeLastMove == lastResponseData.P1Email ? message = lastResponseData.P1Name + " won!!!!!" : message = lastResponseData.P2Name + " won!!!!"
+        lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == lastResponseData.P1Email ? message = lastResponseData.P1Name + " won!!!!!" : message = lastResponseData.P2Name + " won!!!!"
         setWinner(message);
         setRoomID("");
       }
@@ -80,7 +80,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     let moveToSend:wsMove = JSON.parse(JSON.stringify(lastResponseData))
     moveToSend.RoomID = roomID
     moveToSend.Fen = gameCopy.fen()
-    moveToSend.EmailOfOneWhoMadeLastMove = email;
+    moveToSend.EmailOfOneWhoMadeLastMoveAKAWinner = email;
     //console.log("sent data", moveToSend)
     sendMsg(socket, moveToSend)
     setMyTurn(false);
@@ -175,7 +175,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
             setSocket(null);
         };
       }, [])
-    return {game, socket, roomID, error, errorMessage, gameStarted, firstTurn, onDrop, winner, playerNames, noJoin}
+    return {game, socket, roomID, err, errorMessage, gameStarted, firstTurn, onDrop, winner, playerNames, noJoin}
   
 }
 

@@ -21,16 +21,16 @@ function createData(
 const rows = [
     createData(1, 'Name', 1600, '10-0-0'),
     createData(2, 'Name', 1600, '10-0-0'),
-    createData(1, 'Name', 1600, '10-0-0'),
-    createData(2, 'Name', 1600, '10-0-0'),
-    createData(1, 'Name', 1600, '10-0-0'),
-    createData(2, 'Name', 1600, '10-0-0'),
-    createData(1, 'Name', 1600, '10-0-0'),
-    createData(2, 'Name', 1600, '10-0-0'),
-    createData(1, 'Name', 1600, '10-0-0'),
-    createData(2, 'Name', 1600, '10-0-0'),
-    createData(1, 'Name', 1600, '10-0-0'),
-    createData(2, 'Name', 1600, '10-0-0'),
+    createData(3, 'Name', 1600, '10-0-0'),
+    createData(4, 'Name', 1600, '10-0-0'),
+    createData(5, 'Name', 1600, '10-0-0'),
+    createData(6, 'Name', 1600, '10-0-0'),
+    createData(7, 'Name', 1600, '10-0-0'),
+    createData(8, 'Name', 1600, '10-0-0'),
+    createData(9, 'Name', 1600, '10-0-0'),
+    createData(10, 'Name', 1600, '10-0-0'),
+    createData(11, 'Name', 1600, '10-0-0'),
+    createData(12, 'Name', 1600, '10-0-0'),
     
 ];
 

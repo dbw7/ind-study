@@ -9,7 +9,7 @@
 }
 
 .profile-inner{
-    width: 80vw;
+    width: 65vw;
     height: 45vh;
     /* overflow-x: auto; */
     margin-top: 2rem;
@@ -18,10 +18,33 @@
     border-color: #96a6b557;
     border-style: solid;
     min-width: fit-content;
+    padding: 1rem;
 }
 .stats{
     display: flex;
     justify-content: center;
     flex-direction: row;
     gap: 4rem;
+    margin-top: 3rem;
+}
+
+@media screen and (max-width: 700px) {
+    .stats{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem;
+        margin-top: 1rem;
+    }
+    .profile-inner{
+        height: fit-content;
+        width: 85vw;
+    }
+}
+
+@media screen and (max-height: 725px) {
+    .profile-inner{
+        height: fit-content;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+    }
 }

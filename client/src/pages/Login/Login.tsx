@@ -85,6 +85,8 @@ const Login = () =>{
                 rating: responseJSON.rating,
                 wins: responseJSON.wins,
                 losses: responseJSON.losses,
+                draws: responseJSON.draws,
+                rank: responseJSON.rank,
             }
             authCtx.current.login(token, userData);
             console.log("response json", userData)

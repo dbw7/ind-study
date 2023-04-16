@@ -21,6 +21,8 @@ type MicrosoftUser struct {
 	Rating      int    `json:"rating" bson:"rating"`
 	Wins        int    `json:"wins" bson:"wins"`
 	Losses      int    `json:"losses" bson:"losses"`
+	Draws       int    `json:"draws" bson:"draws"`
+	Rank        int    `json:"rank" bson:"rank"`
 }
 
 var (

@@ -12,9 +12,11 @@ type Game = {
 	CurrentTurn:   string,
 	GetsFirstTurn: string,
 	Fen:           string,
-	EmailOfOneWhoMadeLastMove: string,
+	EmailOfOneWhoMadeLastMoveAKAWinner: string,
 	DoesNotExistOrIsFull:  boolean,
 	
 	SomeoneWon: boolean,
+	SomeoneQuit: boolean,
+	isDraw: boolean,
 }
 export default Game;

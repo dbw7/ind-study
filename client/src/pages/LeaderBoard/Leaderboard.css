@@ -24,7 +24,7 @@
 }
 @media (max-height: 550px) {
    .data{
-        margin-top: 3rem;
+        margin-top: 1rem;
     }
 }
 @media (min-width: 1200px) {

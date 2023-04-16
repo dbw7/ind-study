@@ -106,6 +106,8 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 		user.Rating = 1200
 		user.Wins = 0
 		user.Losses = 0
+		user.Draws = 0
+		user.Rank = 999
 	}
 	userCreated := db.FindOrCreateUser(user)
 	_ = userCreated

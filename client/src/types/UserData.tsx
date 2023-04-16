@@ -5,6 +5,8 @@ type UserData  = {
     rating: Number,
     wins: Number,
     losses: Number,
+    rank: Number,
+    draws: Number,
 };
 
 export default UserData;

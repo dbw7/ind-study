@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
-	"independent-study-api/helper"
 	"independent-study-api/internal/db"
 	"log"
 	"math/rand"
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 )
 
 var upgradeConnection = websocket.Upgrader{
@@ -34,15 +32,17 @@ type Game struct {
 	RoomID  string
 	Started bool
 
-	Locked                    bool
-	CurrentTurn               string
-	GetsFirstTurn             string
-	Fen                       string
-	EmailOfOneWhoMadeLastMove string
+	Locked                             bool
+	CurrentTurn                        string
+	GetsFirstTurn                      string
+	Fen                                string
+	EmailOfOneWhoMadeLastMoveAKAWinner string
 
 	DoesNotExistOrIsFull bool
 
-	SomeoneWon bool
+	SomeoneWon  bool
+	SomeoneQuit bool
+	IsDraw      bool
 
 	MsgChan chan string `json:"-"`
 	mu      sync.Mutex  `json:"-"`
@@ -124,9 +124,8 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 				cancel()
 			}
 			conn.WriteJSON(game)
-			conn.Close()
+			safelyCloseConnections(game.P1Conn, game.P2Conn, "126")
 		}
-
 	}
 
 	if err != nil {
@@ -137,174 +136,5 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		return
-	}
-
-}
-
-func ListenForWs(conn *WebSocketConnection, game *Game) {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Println("Error", fmt.Sprintf("%v", r))
-		}
-	}()
-	var payload wsPayload
-	for {
-		err := conn.ReadJSON(&payload)
-		if err != nil {
-			//do nothing, there is no payload
-			if websocket.IsCloseError(err, websocket.CloseNoStatusReceived, websocket.CloseGoingAway) {
-				fmt.Println("game", game)
-				fmt.Printf("%+v\n", game)
-				if *conn == game.P1Conn && !game.Started {
-					fmt.Println("it is player 1's connection")
-					conn.Close()
-					mu.Lock()
-					delete(connections, game.RoomID)
-					mu.Unlock()
-				}
-				//else if &game.P2Conn != nil && *conn == game.P2Conn {
-				//	fmt.Println("it is player 2's connection")
-				//}
-			}
-			fmt.Println("error", err)
-			break
-		} else {
-			fmt.Println("Payload", payload)
-			//sends this to the websocket channel
-			wsChan <- payload
-			game.MsgChan <- "Good"
-		}
-	}
-}
-
-func ListenToWsChannel() {
-	var response wsJsonResponse
-	for {
-		event := <-wsChan
-		response = wsJsonResponse(event)
-		room := event.RoomID
-		fmt.Println("room", room)
-		if connections[room] == nil {
-			fmt.Println("Connection closed unexpectedly", event)
-			return
-		}
-		connections[room].mu.Lock()
-		fmt.Println("event data", event)
-		fmt.Println("response data", response)
-		conn1 := connections[room].P1Conn
-		conn2 := connections[room].P2Conn
-		response.Fen = event.Fen
-		response.Started = true
-		response.RoomID = event.RoomID
-		response.GetsFirstTurn = connections[room].GetsFirstTurn
-		response.EmailOfOneWhoMadeLastMove = event.EmailOfOneWhoMadeLastMove
-
-		if event.EmailOfOneWhoMadeLastMove == connections[room].P1Email {
-			response.CurrentTurn = connections[room].P2Email
-		} else {
-			response.CurrentTurn = connections[room].P1Email
-		}
-		connections[room].CurrentTurn = response.CurrentTurn
-		connections[room].EmailOfOneWhoMadeLastMove = response.EmailOfOneWhoMadeLastMove
-		connections[room].mu.Unlock()
-		err := conn1.WriteJSON(response)
-		if err != nil {
-			log.Println("Websocket err")
-		}
-		err = conn2.WriteJSON(response)
-		if err != nil {
-			log.Println("Websocket err")
-		}
-		if event.SomeoneWon {
-			connections[room].P1Conn.Close()
-			connections[room].P2Conn.Close()
-			delete(connections, room)
-		}
-	}
-}
-
-func freshRoomID() string {
-	mu.Lock()
-	defer mu.Unlock()
-	randomString := helper.GenRandomString(3)
-	for contains(connections, randomString) {
-		randomString = helper.GenRandomString(3)
-	}
-	return randomString
-}
-
-func getCurrentRoomIDs() []string {
-	keys := make([]string, len(connections))
-	i := 0
-	for k := range connections {
-		keys[i] = k
-		i++
-	}
-	return keys
-}
-
-func contains(mapx map[string]*Game, room string) bool {
-	_, ok := mapx[room]
-	if ok {
-		return true
-	} else {
-		return false
-	}
-}
-
-func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
-	//This is to timeout the game after both players have connected
-	timeoutTimer := time.NewTimer(30 * time.Second)
-
-	for {
-		select {
-		case <-ctx.Done():
-			// If the context is canceled, end the loop
-			fmt.Println("Connection closed by context")
-			p1conn := game.P1Conn
-			p2conn := game.P2Conn
-			p1conn.Close()
-			p2conn.Close()
-			delete(connections, game.RoomID)
-			return
-		case <-timeoutTimer.C:
-			mu.Lock()
-			if !game.Started {
-				//game.P1Conn.WriteMessage(websocket.TextMessage, []byte("Second player hasn't joined"))
-				game.P1Conn.WriteJSON(map[string]interface{}{
-					"noJoin": true,
-				})
-				game.P1Conn.Close()
-				delete(connections, game.RoomID)
-			} else {
-				whoHasCurrentTurn := game.CurrentTurn
-				game.P1Conn.WriteJSON(map[string]interface{}{
-					"tookTooLong": whoHasCurrentTurn,
-					"P1Name":      game.P1Name,
-					"P2Name":      game.P2Name,
-					"P1Email":     game.P1Email,
-					"P2Email":     game.P2Email,
-				})
-				game.P2Conn.WriteJSON(map[string]interface{}{
-					"tookTooLong": whoHasCurrentTurn,
-					"P1Name":      game.P1Name,
-					"P2Name":      game.P2Name,
-					"P1Email":     game.P1Email,
-					"P2Email":     game.P2Email,
-				})
-				game.P1Conn.Close()
-				game.P2Conn.Close()
-				delete(connections, game.RoomID)
-			}
-			mu.Unlock()
-		case <-game.MsgChan:
-			if !timeoutTimer.Stop() {
-				<-timeoutTimer.C
-				game.P1Conn.WriteMessage(websocket.TextMessage, []byte("No one has made a move"))
-			} else {
-				timeoutTimer.Reset(300 * time.Second)
-			}
-
-		}
 	}
 }
