@@ -9,6 +9,7 @@ import Game from './pages/Game/Game';
 import CreateGame from './pages/CreateGame/CreateGame';
 import About from './pages/About/About';
 import Leaderboard from './pages/LeaderBoard/Leaderboard';
+// @ts-ignore
 import Profile from './pages/Profile/Profile';
 
 const App: React.FC = ()  => {

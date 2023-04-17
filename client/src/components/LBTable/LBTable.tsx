@@ -69,11 +69,15 @@ const CellTypography = styled(Typography)(({ theme }) => ({
 }));
 
 const LBTable = () => {
-  const userDataArray = useLeaderBoard();
+  const {userDataArrState, error} = useLeaderBoard();
   
   return (
-    // @ts-ignore
-    <StyledTableContainer component={Paper}>
+    
+    <>
+    {error && 
+    <Typography variant="h6" sx={{width:"50vw", textAlign:"center", position:"absolute", right:"25%", color:"white",fontFamily: "inter", fontWeight: "500",}}>Error getting leaderboard.<br></br><br></br>Try refreshing the page.</Typography>}
+    {//@ts-ignore
+    !error && <StyledTableContainer component={Paper}>
       <Table  aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -84,7 +88,7 @@ const LBTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {userDataArray && userDataArray.map((row) => (
+          {userDataArrState && userDataArrState.map((row) => (
             <TableRow
             key={String(row.rank)}
             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -99,7 +103,8 @@ const LBTable = () => {
           ))}
         </TableBody>
       </Table>
-    </StyledTableContainer>
+    </StyledTableContainer>}
+    </>
   );
 }
 

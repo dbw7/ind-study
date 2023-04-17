@@ -5,6 +5,7 @@ import UserData from '../types/UserData';
 const useLeaderBoard = () => {
     const authCtx = useContext(AuthContext);
     const [userDataArrState, setUserDataArrState] = useState<UserData[]>([]);
+    const [error, setError] = useState(false);
     let userDataArr:UserData[] = [];
     
     useEffect(()=>{
@@ -17,6 +18,10 @@ const useLeaderBoard = () => {
             });
             if (response.status  === 401){
                 authCtx.logout();
+                return
+            }
+            if (response.status  !== 200){
+                setError(true);
                 return
             }
             //let firstTime = tokenParams.get("firsttime"); If I wanna do something with first time
@@ -37,7 +42,7 @@ const useLeaderBoard = () => {
             setUserDataArrState(userDataArr);
         })()
     }, [])
-    return userDataArrState;
+    return {userDataArrState, error};
 }
 
 export default useLeaderBoard;
