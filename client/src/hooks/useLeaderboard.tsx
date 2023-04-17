@@ -15,6 +15,10 @@ const useLeaderBoard = () => {
                     'Authorization': "Bearer " + authCtx.token
                 }
             });
+            if (response.status  === 401){
+                authCtx.logout();
+                return
+            }
             //let firstTime = tokenParams.get("firsttime"); If I wanna do something with first time
             const responseJSON = await response.json();
             

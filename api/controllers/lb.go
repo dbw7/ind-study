@@ -5,9 +5,18 @@ import (
 	"fmt"
 	"independent-study-api/internal/db"
 	"net/http"
+	"strings"
 )
 
 func LeaderboardHandler(w http.ResponseWriter, r *http.Request) {
+	userData, ok := r.Context().Value("props").(db.MicrosoftUser)
+	if ok {
+		if !strings.Contains(userData.Email, "@villanova.edu") {
+			w.WriteHeader(403)
+			return
+		}
+	}
+
 	usersByRank := db.GetUsersByRank(false)
 	err := json.NewEncoder(w).Encode(usersByRank)
 	if err != nil {

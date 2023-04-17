@@ -23,9 +23,13 @@ const App: React.FC = ()  => {
           <Route path='/' element={<Homepage />} />
           <Route path='/login' element={<Login />}/>
           <Route path='/about' element={<About />}/>
-          <Route path='/leaderboard' element={<Leaderboard />}/>
-          <Route path='/profile' element={<Profile />}/>
-          {authCtx.isLoggedIn ? <Route path='/create-game' element={<CreateGame />}/> : <Route path='/create-game' element={<Navigate to="/login" replace />} />}
+          {/* //Looks like a really complex statement but the idea is, if you're not logged in, redirect to login, if you're logged in but not part of villanova, redirect to homepage */}
+          {authCtx.isLoggedIn ? 
+          (authCtx.userData.email.endsWith("@villanova.edu") ? <Route path='/leaderboard' element={<Leaderboard />}/> : <Route path='/leaderboard' element={<Navigate to="/" replace />} />) 
+          : 
+          <Route path='/leaderboard' element={<Navigate to="/login" replace />} />}
+          {authCtx.isLoggedIn ? <Route path='/profile' element={<Profile />}/> : <Route path='/profile' element={<Navigate to="/login" replace />} />}
+          {authCtx.isLoggedIn ? <Route path='/create-game' element={<CreateGame />} /> : <Route path='/create-game' element={<Navigate to="/login" replace />} />}
           {authCtx.isLoggedIn ? <Route path='/game' element={<Game />}/> : <Route path='/game' element={<Navigate to="/login" replace />} />}
       </Routes>
     </div>
