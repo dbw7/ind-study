@@ -8,7 +8,7 @@ import (
 
 func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 	//This is to timeout the game after both players have connected
-	timeoutTimer := time.NewTimer(30 * time.Second)
+	timeoutTimer := time.NewTimer(300 * time.Second)
 
 	for {
 		select {
@@ -18,6 +18,7 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 			mu.Lock()
 			safelyCloseConnections(game.P1Conn, game.P2Conn, "handleContext 18")
 			delete(connections, game.RoomID)
+			game = nil
 			mu.Unlock()
 			return
 		case <-timeoutTimer.C:
@@ -29,6 +30,7 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 				})
 				safelyCloseConnections(game.P1Conn, game.P2Conn, "handleContext 29")
 				delete(connections, game.RoomID)
+				game = nil
 			} else {
 				whoHasCurrentTurn := game.CurrentTurn
 				game.P1Conn.WriteJSON(map[string]interface{}{
@@ -47,6 +49,7 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 				})
 				safelyCloseConnections(game.P1Conn, game.P2Conn, "handleContext 47")
 				delete(connections, game.RoomID)
+				game = nil
 			}
 			mu.Unlock()
 			return

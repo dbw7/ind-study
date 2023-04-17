@@ -34,7 +34,7 @@ func ListenToWsChannel() {
 		}
 		connections[room].CurrentTurn = response.CurrentTurn
 		connections[room].EmailOfOneWhoMadeLastMoveAKAWinner = response.EmailOfOneWhoMadeLastMoveAKAWinner
-		connections[room].mu.Unlock()
+
 		err := conn1.WriteJSON(response)
 		if err != nil {
 			log.Println("Websocket err")
@@ -43,6 +43,7 @@ func ListenToWsChannel() {
 		if err != nil {
 			log.Println("Websocket err")
 		}
+		connections[room].mu.Unlock()
 		if event.SomeoneWon {
 			safelyCloseConnections(connections[room].P1Conn, connections[room].P2Conn, "channel 47")
 			delete(connections, room)

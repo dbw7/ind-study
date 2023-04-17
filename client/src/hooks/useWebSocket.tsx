@@ -182,7 +182,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
             setSocket(null);
         };
       }, [])
-    return {game, socket, roomID, err, errorMessage, gameStarted, firstTurn, onDrop, winner, playerNames, noJoin}
+    return {game, socket, roomID, err, errorMessage, gameStarted, firstTurn, onDrop, winner, playerNames, noJoin, myTurn}
   
 }
 

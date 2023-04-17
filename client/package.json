@@ -16,6 +16,7 @@
     "chess.js": "^1.0.0-beta.4",
     "react": "^18.2.0",
     "react-chessboard": "^2.1.2",
+    "react-countdown": "^2.3.5",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0",
     "react-social-login-buttons": "^3.6.1"

@@ -33,6 +33,7 @@ func ListenForWs(conn *WebSocketConnection, game *Game) {
 					game.SomeoneWon = true
 					game.P2Conn.WriteJSON(game)
 					safelyCloseConnections(game.P1Conn, game.P2Conn, "conn 35")
+					delete(connections, game.RoomID)
 					mu.Unlock()
 				} else if *conn == game.P2Conn && game.Started {
 					//This means player 2 quit/disconnected.
@@ -41,6 +42,7 @@ func ListenForWs(conn *WebSocketConnection, game *Game) {
 					game.SomeoneWon = true
 					game.P1Conn.WriteJSON(game)
 					safelyCloseConnections(game.P1Conn, game.P2Conn, "conn 44")
+					delete(connections, game.RoomID)
 					mu.Unlock()
 				}
 			}

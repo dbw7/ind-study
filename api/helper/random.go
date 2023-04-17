@@ -6,7 +6,7 @@ import (
 	"unsafe"
 )
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyz123456789"
+const letterBytes = "cfhjkpqrxz12345789"
 
 var src = rand.NewSource(time.Now().UnixNano())
 

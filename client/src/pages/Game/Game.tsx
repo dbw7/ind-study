@@ -14,8 +14,11 @@ const Game: FC = () => {
     const [queryParams] = useSearchParams();
     let roomQuery = queryParams.get("room");
     
+    
     if(!roomQuery){
         roomQuery = "";
+    } else {
+        roomQuery = roomQuery?.toLocaleLowerCase();
     }
     
     return(

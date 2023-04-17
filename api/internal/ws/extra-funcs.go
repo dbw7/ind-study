@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"fmt"
 	"independent-study-api/helper"
 	"log"
 )
@@ -35,6 +36,7 @@ func freshRoomID() string {
 }
 
 func safelyCloseConnections(p1Conn WebSocketConnection, p2Conn WebSocketConnection, ref string) {
+	fmt.Println("closing connection", ref)
 	if p1Conn.Conn != nil {
 		err := p1Conn.Conn.Close()
 		if err != nil {

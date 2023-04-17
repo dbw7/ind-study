@@ -130,6 +130,9 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 			}
 			conn.WriteJSON(game)
 			safelyCloseConnections(game.P1Conn, game.P2Conn, "126")
+			mu.Lock()
+			delete(connections, roomID)
+			mu.Unlock()
 		}
 	}
 
