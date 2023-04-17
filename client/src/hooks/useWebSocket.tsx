@@ -152,7 +152,14 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
           navigate('/login')
           return
         }
-        let ws = new WebSocket(`ws://localhost:8080/ws:${room}:${email}`);
+        let ws:WebSocket;
+        try {
+          ws = new WebSocket(`ws://localhost:8080/ws:${room}:${email}:${authCtx.token}`);
+        } catch (error) {
+          console.log("error connecting to ws", error)
+          setError(true);
+          return
+        }
         ws.onopen = () => {
             console.log("Successfully Connected");
             setSocket(ws);

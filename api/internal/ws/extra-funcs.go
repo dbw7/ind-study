@@ -48,3 +48,12 @@ func safelyCloseConnections(p1Conn WebSocketConnection, p2Conn WebSocketConnecti
 		}
 	}
 }
+
+func AuthWebsocket(token string) bool {
+	_, worked := helper.ParseToken(token)
+	if worked {
+		return true
+	} else {
+		return false
+	}
+}

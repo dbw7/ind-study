@@ -8,6 +8,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
 import { Typography } from "@mui/material";
+import UserData from '../../types/UserData';
+import useLeaderBoard from '../../hooks/useLeaderboard';
 
 function createData(
     rank: number,
@@ -65,8 +67,10 @@ const CellTypography = styled(Typography)(({ theme }) => ({
       fontFamily: "inter"
     }
 }));
+
+const LBTable = () => {
+  const userDataArray = useLeaderBoard();
   
-export default function LBTable() {
   return (
     // @ts-ignore
     <StyledTableContainer component={Paper}>
@@ -80,21 +84,23 @@ export default function LBTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {userDataArray && userDataArray.map((row) => (
             <TableRow
-              key={row.rank}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row" align='center'>
-                <CellTypography>{row.rank}</CellTypography>
-              </TableCell>
-              <TableCell align='center'><CellTypography>{row.name}</CellTypography></TableCell>
-              <TableCell align='center'><CellTypography>{row.rating}</CellTypography></TableCell>
-              <TableCell align='center'><CellTypography>{row.wdl}</CellTypography></TableCell>
-            </TableRow>
+            key={String(row.rank)}
+            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+          >
+            <TableCell component="th" scope="row" align='center'>
+              <CellTypography>{String(row.rank)}</CellTypography>
+            </TableCell>
+            <TableCell align='center'><CellTypography>{row.name}</CellTypography></TableCell>
+            <TableCell align='center'><CellTypography>{String(row.rating)}</CellTypography></TableCell>
+            <TableCell align='center'><CellTypography>{row.wins + "-" + row.draws+"-" + row.losses}</CellTypography></TableCell>
+          </TableRow>
           ))}
         </TableBody>
       </Table>
     </StyledTableContainer>
   );
 }
+
+export default LBTable;

@@ -47,6 +47,7 @@ func ParseToken(tokenString string) (user db.MicrosoftUser, worked bool) {
 	})
 	//This means something went wrong parsing key
 	if err != nil {
+		fmt.Println(user)
 		fmt.Println("jwt 49 you bozo, error parsing key, probably something malicious:", err)
 		return user, false
 	}

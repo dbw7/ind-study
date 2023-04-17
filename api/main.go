@@ -1,17 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"independent-study-api/controllers"
-	"independent-study-api/helper"
 	"independent-study-api/internal/ws"
+	"independent-study-api/middleware"
 	"log"
 	"net/http"
-	"strings"
 )
 
 func init() {
@@ -36,14 +34,16 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
-	//router.Get("/api/getExample", getHandler)
-	//router.Get("/api/test", middleware.AuthMiddleware(http.HandlerFunc(getHandler)))
+
 	router.Get("/api/test", testHandler)
+	router.Get("/api/leaderboard", middleware.AuthMiddleware(http.HandlerFunc(controllers.LeaderboardHandler)))
+	router.Get("/api/userdata", middleware.AuthMiddleware(http.HandlerFunc(controllers.UserHandler)))
+
 	router.HandleFunc("/auth", controllers.MicrosoftLogin)
 	router.HandleFunc("/auth/ms", controllers.MicrosoftCallback)
-	router.Get("/auth/verify", verifyHandler)
-	router.HandleFunc("/ws:{room}:{player}", ws.ServeWs)
+	router.Get("/auth/verify", middleware.AuthMiddleware(http.HandlerFunc(controllers.VerifyHandler)))
 
+	router.HandleFunc("/ws:{room}:{player}:{token}", ws.ServeWs)
 	go ws.ListenToWsChannel()
 
 	fmt.Println("Server listening on port 8080")
@@ -53,31 +53,4 @@ func main() {
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-}
-func verifyHandler(w http.ResponseWriter, r *http.Request) {
-	authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer ")
-	if len(authHeader) != 2 {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	} else {
-		userJSON, worked := helper.ParseToken(authHeader[1])
-		if worked {
-			err := json.NewEncoder(w).Encode(userJSON)
-			if err != nil {
-				fmt.Println("error main.go", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			} else {
-				//w.WriteHeader(http.StatusOK)
-				return
-			}
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-	}
-}
-
-func postHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(chi.URLParam(r, "room"))
 }

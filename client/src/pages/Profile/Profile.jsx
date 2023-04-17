@@ -1,9 +1,12 @@
 import React, { useContext } from "react";
 import './Profile.css'
 import { Typography } from "@mui/material";
-import AuthContext from "../../context/auth-context";
+import useUserData from "../../hooks/useUserData";
+
 const Profile = () => {
-    const authCtx = useContext(AuthContext);
+    
+    const authCtx = useUserData();
+    
     return(
         <div className="profile">
             <div className="profile-inner">

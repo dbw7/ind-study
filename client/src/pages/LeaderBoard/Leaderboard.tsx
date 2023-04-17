@@ -1,9 +1,7 @@
-import React from "react";
 import './Leaderboard.css';
 import LBTable from "../../components/LBTable/LBTable";
 
 const Leaderboard =  () => {
-    
     return(
         <div className="dashboard-main">
             <div className='data'>

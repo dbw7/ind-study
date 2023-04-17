@@ -65,12 +65,17 @@ var connections = make(map[string]*Game)
 var mu sync.Mutex
 
 func ServeWs(w http.ResponseWriter, r *http.Request) {
+	token := chi.URLParam(r, "token")
+	if !AuthWebsocket(token) {
+		return
+	}
 	ws, err := upgradeConnection.Upgrade(w, r, nil)
 	var ctx context.Context
 	var cancel context.CancelFunc
 
 	roomID := chi.URLParam(r, "room")
 	playerEmail := chi.URLParam(r, "player")
+
 	fmt.Println(roomID)
 
 	if strings.Compare("initial", roomID) == 0 {

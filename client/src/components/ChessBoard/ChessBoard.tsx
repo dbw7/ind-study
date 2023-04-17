@@ -14,7 +14,7 @@ interface props {
 
 const ChessBoard = (props:props) => { 
   const authCtx = useContext(AuthContext); 
-  const {game, firstTurn, onDrop, gameStarted, roomID, winner, playerNames, error, noJoin} = useWebsocket(props.room, authCtx.userData.email, authCtx)
+  const {game, firstTurn, onDrop, gameStarted, roomID, winner, playerNames, err, noJoin} = useWebsocket(props.room, authCtx.userData.email, authCtx)
   
   useEffect(()=>{
     //console.log("playernames", playerNames)
@@ -22,9 +22,9 @@ const ChessBoard = (props:props) => {
   
   return (
     <>
-      {error && <ErrorBox></ErrorBox>}
+      {err && <ErrorBox></ErrorBox>}
       <Typography variant="h1">{winner}</Typography>
-      {!error && (!props.room || (props.room.length != 3 && props.room != "initial") || props.room == "null") && <InvalidBox></InvalidBox>}
+      {!err && (!props.room || (props.room.length != 3 && props.room != "initial") || props.room == "null") && <InvalidBox></InvalidBox>}
       {(roomID && !gameStarted) && <RoomBox roomID={roomID} noJoin={noJoin}/>}
       <div className="board">
         {gameStarted && 

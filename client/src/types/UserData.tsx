@@ -1,5 +1,5 @@
 type UserData  = {
-    userId: string,
+    //userId: string,
     name: string,
     email: string,
     rating: Number,

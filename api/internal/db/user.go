@@ -1,20 +1,20 @@
 package db
 
 import (
-	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"time"
+	"sort"
 )
 
 type MicrosoftUser struct {
-	ID string `json:"ID" bson:"_id,omitempty"`
-	//MSID      string             `json:"MSID" bson:"msid"`
-	GivenName string `json:"givenName" bson:"givenName"`
-	Surname   string `json:"surname" bson:"surname"`
+	//ID string `json:"ID" bson:"_id,omitempty"`
+	ID        primitive.ObjectID `json:"_id" bson:"_id"`
+	MSID      string             `json:"Id" bson:"Id"`
+	GivenName string             `json:"givenName" bson:"givenName"`
+	Surname   string             `json:"surname" bson:"surname"`
 	// Mail        string `json:"mail"`
 	Email       string `json:"userPrincipalName" bson:"email"`
 	DisplayName string `json:"displayName" bson:"displayName"`
@@ -27,31 +27,15 @@ type MicrosoftUser struct {
 
 var (
 	UserCollection *mongo.Collection
-	Ctx            = context.TODO()
 )
-
-func init() {
-	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
-	clientOptions := options.Client().
-		ApplyURI("mongodb://localhost:27017").
-		SetServerAPIOptions(serverAPIOptions)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		fmt.Println("Successfully connected!")
-	}
-	UserCollection = client.Database("wschess").Collection("users")
-}
 
 // Searches for user in the database using the info from MS
 // Returns the user and a bool on whether the user was found in the db
 
 func FindUser(user MicrosoftUser) (MicrosoftUser, bool) {
 	var result MicrosoftUser
-	err := UserCollection.FindOne(Ctx, user).Decode(&result)
+	filter := bson.M{"_id": user.ID}
+	err := UserCollection.FindOne(Ctx, filter).Decode(&result)
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -93,11 +77,75 @@ func FindOrCreateUser(user MicrosoftUser) bool {
 func GetUsersName(userEmail string) string {
 	var user MicrosoftUser
 	err := UserCollection.FindOne(Ctx, bson.M{"email": userEmail}).Decode(&user)
-	fmt.Println("User", user, userEmail)
+	//fmt.Println("User", user, userEmail)
 	if err != nil {
 		fmt.Println("Error getting user name", err)
 		return ""
 	} else {
 		return user.DisplayName
+	}
+}
+
+func GetUsersByRank(wantExtraInfo bool) []MicrosoftUser {
+	opts := options.Find().SetSort(bson.D{{Key: "rank", Value: 1}})
+	cursor, err := UserCollection.Find(Ctx, bson.M{}, opts)
+	if err != nil {
+		fmt.Println("Error getting users by rank1", err)
+		return nil
+	}
+	defer cursor.Close(Ctx)
+
+	var users []MicrosoftUser
+	err = cursor.All(Ctx, &users)
+	if err != nil {
+		fmt.Println("Error getting users by rank2", err)
+		return nil
+	}
+	if !wantExtraInfo {
+		for i := range users {
+			users[i].Email = ""
+			users[i].ID = primitive.NilObjectID
+			users[i].MSID = ""
+		}
+	}
+
+	return users
+}
+
+func GetUsers() []MicrosoftUser {
+	cursor, err := UserCollection.Find(Ctx, bson.M{})
+	if err != nil {
+		fmt.Println("Error getting users by rank1", err)
+		return nil
+	}
+	defer cursor.Close(Ctx)
+
+	var users []MicrosoftUser
+	err = cursor.All(Ctx, &users)
+	if err != nil {
+		fmt.Println("Error getting users by rank2", err)
+		return nil
+	}
+	return users
+}
+
+func UpdateUsersRanks() {
+	AllUsers := GetUsers()
+	if len(AllUsers) == 0 {
+		return
+	}
+	sort.Slice(AllUsers[:], func(i, j int) bool {
+		return AllUsers[i].Rating > AllUsers[j].Rating
+	})
+
+	for idx, user := range AllUsers {
+		//fmt.Println("user", user, idx)
+		filter := bson.M{"_id": user.ID}
+		update := bson.M{"$set": bson.M{"rank": idx + 1}}
+		_, err := UserCollection.UpdateOne(Ctx, filter, update)
+		//fmt.Println("result", result)
+		if err != nil {
+			fmt.Println("Error updating user rank 146", err)
+		}
 	}
 }

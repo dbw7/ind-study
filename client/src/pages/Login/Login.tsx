@@ -58,8 +58,10 @@ const Login = () =>{
     }, [tokenParams]);
     
     useEffect(() => {
+        
         (async () =>{
             let token = tokenParams.get("token");
+            console.log(token)
             if(!token){
                 return
             }
@@ -81,7 +83,7 @@ const Login = () =>{
             const userData:UserData = {
                 email: responseJSON.userPrincipalName,
                 name: responseJSON.displayName,
-                userId: responseJSON.ID,
+                //userId: responseJSON.ID,
                 rating: responseJSON.rating,
                 wins: responseJSON.wins,
                 losses: responseJSON.losses,
