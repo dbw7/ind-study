@@ -1,6 +1,7 @@
 import {useEffect, useContext, useState} from 'react';
 import AuthContext from '../context/auth-context';
 import UserData from '../types/UserData';
+import config from '../config.json';
 
 const useLeaderBoard = () => {
     const authCtx = useContext(AuthContext);
@@ -11,7 +12,7 @@ const useLeaderBoard = () => {
     useEffect(()=>{
         userDataArr = [];
         (async ()=>{
-            const response = await fetch('http://localhost:8080/api/leaderboard', {
+            const response = await fetch(`${config.URL}/api/leaderboard`, {
                 headers:{
                     'Authorization': "Bearer " + authCtx.token
                 }

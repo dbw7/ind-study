@@ -4,8 +4,8 @@ import wsMove from "../types/Move";
 import { Chess } from "chess.js";
 import { useNavigate } from "react-router-dom";
 import { AuthContextType } from "../context/auth-context";
+import config from "../config.json";
 
-  
 const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     const [playerNames, setPlayerNames] = useState({w: "", b: ""});
     const [game, setGame] = useState<Chess>(new Chess());
@@ -154,7 +154,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
         }
         let ws:WebSocket;
         try {
-          ws = new WebSocket(`ws://localhost:8080/ws:${room}:${email}:${authCtx.token}`);
+          ws = new WebSocket(`${config.WS_URL}:${room}:${email}:${authCtx.token}`);
         } catch (error) {
           console.log("error connecting to ws", error)
           setError(true);

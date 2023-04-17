@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from "react"
 import UserData from "../types/UserData";
 import AuthContext from "../context/auth-context";
+import config from "../config.json";
 
 const useUserData = () => {
     const authCtx = useContext(AuthContext);
@@ -8,7 +9,7 @@ const useUserData = () => {
     let token:string = authCtx.token;
     useEffect(()=>{
         (async () =>{
-            const response = await fetch('http://localhost:8080/api/userdata', {
+            const response = await fetch(`${config.URL}/api/userdata`, {
                 headers:{
                     'Authorization': "Bearer " + authCtx.token
                 }

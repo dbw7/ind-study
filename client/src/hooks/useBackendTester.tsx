@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import AuthContext from "../context/auth-context";
 import { useNavigate } from "react-router-dom";
-
+import config from "../config.json";
 
 
 const useBackendTester = () => {
@@ -11,7 +11,7 @@ const useBackendTester = () => {
     useEffect(() => {
         (async () =>{
             try {
-                const response = await fetch('http://localhost:8080/auth/verify', {
+                const response = await fetch(`${config.URL}/auth/verify`, {
                 headers:{
                     'Authorization': "Bearer " + authCtx.token
                 }

@@ -88,7 +88,8 @@ func GetUsersName(userEmail string) string {
 
 func GetUsersByRank(wantExtraInfo bool) []MicrosoftUser {
 	opts := options.Find().SetSort(bson.D{{Key: "rank", Value: 1}})
-	cursor, err := UserCollection.Find(Ctx, bson.M{}, opts)
+	filter := bson.M{"email": bson.M{"$regex": "@villanova\\.edu", "$options": "i"}}
+	cursor, err := UserCollection.Find(Ctx, filter, opts)
 	if err != nil {
 		fmt.Println("Error getting users by rank1", err)
 		return nil

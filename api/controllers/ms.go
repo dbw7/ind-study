@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"independent-study-api/helper"
 	"independent-study-api/internal/config"
 	"independent-study-api/internal/db"
@@ -103,6 +104,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	//fmt.Println(user)
 	foundUser, existsInDbAlready := db.FindUser(user)
 	if !existsInDbAlready {
+		user.ID = primitive.NewObjectID()
 		user.Rating = 1200
 		user.Wins = 0
 		user.Losses = 0
