@@ -22,7 +22,8 @@ const StyledButton = styled(Button)<ButtonProps>(({ theme }) => ({
 }));
 
 interface props {
-    text: string
+    text: string,
+    version: Number
 }
 
 const CreateGameButton = (props: props) => {
@@ -31,10 +32,14 @@ const CreateGameButton = (props: props) => {
     let roomQuery = queryParams.get("room");
     
     const buttonHandler = () => {
-        if(roomQuery){
-            window.location.href = "/game?room=initial";
-        } else {
-            navigate('/game?room=initial')
+        if(props.version === 1){
+            if(roomQuery){
+                window.location.href = "/game?room=initial";
+            } else {
+                navigate('/game?room=initial')
+            }
+        } else if(props.version === 2){
+            navigate('/create-game')
         }
     }
     

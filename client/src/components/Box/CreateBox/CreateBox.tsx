@@ -37,7 +37,7 @@ const CreateBox = () => {
     return( 
         <>
             <div className="create-box">
-                <CreateGameButton text="Create Game"/>
+                <CreateGameButton version={1} text="Create Game"/>
                 <br></br>
                 <br></br>
                 <br></br>

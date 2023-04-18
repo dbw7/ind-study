@@ -18,17 +18,35 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     const [firstTurn, setFirstTurn] = useState<boolean>(true);
     const [fen, setFen] = useState<string>();
     const [lastResponseData, setLastResponseData] = useState<Game>();
-    const [winner, setWinner] = useState<string>("");
     const [noJoin, setNoJoin] = useState<boolean>(false);
-	
+    //const [iWon, setIwon] = useState<boolean>(false);
+    //const [winner, setWinner] = useState<string>("");
+    //const [loser, setLoser] = useState<string>("");
+    const [results, setResults] = useState<{winner: string, loser: string, iWon:boolean, tookTooLong:boolean}>({winner: "", loser: "", iWon: false, tookTooLong: false});
+    
     const navigate = useNavigate();
     
     useEffect(()=>{
       console.log(lastResponseData, "29292929")
       if(lastResponseData?.SomeoneWon){
-        let message;
-        lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == lastResponseData.P1Email ? message = lastResponseData.P1Name + " won!!!!!" : message = lastResponseData.P2Name + " won!!!!"
-        setWinner(message);
+        if(lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == lastResponseData.P1Email){
+          setResults((prevState)=>{
+            return {...prevState, winner: lastResponseData.P1Name, loser: lastResponseData.P2Name}
+          })
+        } else {
+          setResults((prevState)=>{
+            return {...prevState, winner: lastResponseData.P2Name, loser: lastResponseData.P1Name}
+          })
+        }
+        if(lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == email){
+          setResults((prevState)=>{
+            return {...prevState, iWon: true}
+          })
+        } else {
+          setResults((prevState)=>{
+            return {...prevState, iWon: false}
+          })
+        }
         setRoomID("");
       }
     }, [lastResponseData])
@@ -109,9 +127,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
             return
           }
           if(data1.tookTooLong){
-            let message;
-            data1.tookTooLong == data1.P1Email ? message = data1.P2Name + " won!!!!!" : message = data1.P1Name + " won!!!!"
-            setWinner(message);
+            handleTimeout(data1);
             setRoomID("");
             console.log("this player took too long", data1.tookTooLong)
             return
@@ -182,9 +198,31 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
             setSocket(null);
         };
       }, [])
-    return {game, socket, roomID, err, errorMessage, gameStarted, firstTurn, onDrop, winner, playerNames, noJoin, myTurn}
+    const handleTimeout = (data1:any) => {
+		if(data1.tookTooLong == data1.P2Email){
+        	setResults((prevState)=>{
+            	return {...prevState, winner: data1.P1Name, loser: data1.P2Name}
+            })
+        } else {
+        	setResults((prevState)=>{
+            	return {...prevState, winner: data1.P2Name, loser: data1.P1Name}
+            })
+        }
+        if(data1.tookTooLong != email){
+        	setResults((prevState)=>{
+              	return {...prevState, iWon: true, tookTooLong: true}
+            })
+        } else {
+        	setResults((prevState)=>{
+              	return {...prevState, iWon: false, tookTooLong: true}
+            })
+        }    
+    }
+    return {game, socket, roomID, err, errorMessage, gameStarted, firstTurn, onDrop, playerNames, noJoin, myTurn, results}
   
 }
+
+
 
 const sendMsg = (socket:WebSocket, move: wsMove) => {
     //console.log("sending")

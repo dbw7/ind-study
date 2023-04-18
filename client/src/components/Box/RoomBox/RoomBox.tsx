@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import '../Boxes.css';
+import './RoomBox.css';
 import CreateGameButton from "../BoxButtons/CreateGameButton";
 
 interface props {
@@ -27,7 +27,7 @@ const RoomBox = (props:props) => {
                     <Typography  color="#ffdc19" fontFamily={"inter"} fontWeight="700" variant="h4" >Player took too long to join.</Typography> 
                     : 
                     <Typography  color="#6b5ba8" fontFamily={"inter"} fontWeight="700" variant="h4" >Waiting for player to join...</Typography>}
-                    {props.noJoin && <CreateGameButton text="Create New Game" />}
+                    {props.noJoin && <CreateGameButton version={1} text="Create New Game" />}
                 </div>
             </div>
         </>

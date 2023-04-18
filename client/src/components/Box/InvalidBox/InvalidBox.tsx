@@ -1,5 +1,5 @@
 import React from "react";
-import '../Boxes.css';
+import './InvalidBox.css';
 import { Typography } from "@mui/material";
 import CreateGameButton from "../BoxButtons/CreateGameButton";
 
@@ -17,7 +17,7 @@ const InvalidBox = () => {
                         <Typography  color="#e9b14a" fontFamily={"inter"} fontWeight="700" variant="h4" >Want to start a game? Click here.</Typography>
                     </div>
                     <br></br>
-                    <CreateGameButton text="Create New Game" />
+                    <CreateGameButton version={2} text="Create New Game" />
                 </div>
             </div>
         </>
