@@ -56,8 +56,8 @@ func ListenToWsChannel() {
 				connections[room].GameInstance.Loser = connections[room].P1Name
 			}
 
-			response.P1Rating = rating1Int
-			response.P2Rating = rating2Int
+			response.NewP1Rating = rating1Int
+			response.NewP2Rating = rating2Int
 			response.P1EloChange = elo1Change
 			response.P2EloChange = elo2Change
 			connections[room].GameInstance.NewP1Rating = rating1Int
