@@ -10,11 +10,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import { Icon, styled } from '@mui/material';
+import { styled } from '@mui/material';
 import { useNavigate } from 'react-router';
 import AuthContext from '../../context/auth-context';
 import { Link } from 'react-router-dom';
-import ListItem from "@mui/material/ListItem";
+import logo from "../../images/logo.png";
 
 const pages = ['Home', 'About', 'Play'];
 //const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -84,7 +84,7 @@ function Navbar() {
 		<AppBar position="static" sx={{ background: "none", boxShadow: "none" }}>
 			<Container maxWidth="lg">
 				<Toolbar disableGutters>
-					<img src='https://cdn-icons-png.flaticon.com/512/10281/10281803.png' width="50px"></img>
+					<img src={logo} width="50px"></img>
 
 					<Link style={{
 						textDecoration: "none",

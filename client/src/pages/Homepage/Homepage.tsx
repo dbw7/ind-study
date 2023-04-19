@@ -5,7 +5,7 @@ import React, { FC, useContext } from "react";
 import "./Homepage.css"
 import { useNavigate } from "react-router";
 import AuthContext from "../../context/auth-context";
-
+import chess from "../../images/chess.png"
 let themex = createTheme();
 themex = responsiveFontSizes(themex);
 
@@ -34,7 +34,7 @@ const Homepage: FC = () => {
                             navigate("/login")} }} className="button" sx={{width:"200px", borderRadius:"5px"}} variant="contained"><Typography fontFamily={"inter"} fontWeight="700" variant="h6">Play</Typography></ColorButton>
                 </div>
                 <div className="image-div">
-                    <img className="img" src="https://cdn-icons-png.flaticon.com/512/1366/1366540.png"></img>
+                    <img className="img" src={chess}></img>
                 </div>
             </div>
         </ThemeProvider>

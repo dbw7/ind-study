@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import './Profile.css'
 import { Typography } from "@mui/material";
 import useUserData from "../../hooks/useUserData";
+import pfp from "../../images/profile.png"
 
 const Profile = () => {
     
@@ -10,7 +11,7 @@ const Profile = () => {
     return(
         <div className="profile">
             <div className="profile-inner">
-                <img src="https://cdn-icons-png.flaticon.com/512/5125/5125316.png" width="100px"/>
+                <img src={pfp} width="100px"/>
                 <Typography fontFamily={"inter"} sx={{color:"hsl(246,  6%, 55%)"}} marginBottom="1rem" variant="h5">{authCtx.userData.name}</Typography>
                 <Typography fontFamily={"inter"} sx={{color:"white", fontWeight:"700"}} marginBottom="1rem" variant="h5">Rank: {authCtx.userData.rank === 999 ? "No Games Played Yet" : authCtx.userData.rank}</Typography> 
                 <div className="stats">

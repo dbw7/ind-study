@@ -3,7 +3,7 @@ import './GameEndBox.css';
 import { Typography } from "@mui/material";
 import CreateGameButton from "../BoxButtons/CreateGameButton";
 import Results from "../../../types/Results";
-
+import trophy from "../../../images/trophy.png"
 
 const GameEndBox = (props:Results) => {
     return( 
@@ -11,7 +11,7 @@ const GameEndBox = (props:Results) => {
             {!props.isDraw ? 
             <div className={props.iWon ? "end-game-box-win" : "end-game-box-lose"}>
             <div style={{textAlign:"center"}}>
-                {props.iWon && <img className="trophy" src="https://cdn-icons-png.flaticon.com/512/1069/1069234.png"></img>}
+                {props.iWon && <img className="trophy" src={trophy}></img>}
                 <Typography  color={props.iWon ? "#ced8c7" : "#a1579e"} fontFamily={"inter"} fontWeight="700" variant="h4">
                     {!props.tookTooLong ? 
                         props.iWon ? `You defeated ${props.loser}!` : `You lost to ${props.winner}!`
