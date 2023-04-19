@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"independent-study-api/internal/db"
 	"log"
 	"math/rand"
@@ -26,6 +27,13 @@ type Game struct {
 	P1Name string
 	P2Name string
 
+	P1Rating    int
+	P2Rating    int
+	P2EloChange int
+	P1EloChange int
+	P1Rank      int
+	P2Rank      int
+
 	P1Conn WebSocketConnection
 	P2Conn WebSocketConnection
 
@@ -42,11 +50,17 @@ type Game struct {
 
 	SomeoneWon  bool
 	SomeoneQuit bool
-	IsDraw      bool
+	IsDraw      bool `json:"isDraw"`
 
-	MsgChan chan string `json:"-"`
-	mu      sync.Mutex  `json:"-"`
+	MsgChan      chan string `json:"-"`
+	GameInstance db.DBGame   `json:"-"`
 }
+
+var (
+	EmptyGame         = &Game{}
+	EmptyGameInstance = &db.DBGame{}
+)
+
 type wsPayload struct {
 	Game
 }
@@ -83,15 +97,17 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel = context.WithCancel(context.Background())
 		defer cancel()
 		freshRoom := freshRoomID()
-		p1Name := db.GetUsersName(playerEmail)
+		p1Name, p1Rank, p1Rating := db.GetUsersNameRankAndRating(playerEmail)
 		game := &Game{
-			RoomID:  freshRoom,
-			P1Email: playerEmail,
-			P1Conn:  conn,
-			Started: false,
-			Locked:  false,
-			P1Name:  p1Name,
-			MsgChan: make(chan string),
+			RoomID:   freshRoom,
+			P1Email:  playerEmail,
+			P1Conn:   conn,
+			Started:  false,
+			Locked:   false,
+			P1Name:   p1Name,
+			MsgChan:  make(chan string),
+			P1Rank:   p1Rank,
+			P1Rating: p1Rating,
 		}
 		connections[freshRoom] = game
 		conn.WriteJSON("You made a new room, id is")
@@ -102,13 +118,15 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 	} else {
 		conn := WebSocketConnection{Conn: ws}
 		if contains(connections, roomID) && len(connections[roomID].P2Email) == 0 {
-			connections[roomID].mu.Lock()
-			p2Name := db.GetUsersName(playerEmail)
+			mu.Lock()
+			p2Name, p2Rank, p2Rating := db.GetUsersNameRankAndRating(playerEmail)
 			connections[roomID].P2Email = playerEmail
 			connections[roomID].P2Conn = conn
 			connections[roomID].Locked = true
 			connections[roomID].Started = true
 			connections[roomID].P2Name = p2Name
+			connections[roomID].P2Rank = p2Rank
+			connections[roomID].P2Rating = p2Rating
 			if rand.Intn(2) == 0 {
 				connections[roomID].GetsFirstTurn = connections[roomID].P2Email
 				connections[roomID].CurrentTurn = connections[roomID].P2Email
@@ -116,10 +134,29 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 				connections[roomID].GetsFirstTurn = connections[roomID].P1Email
 				connections[roomID].CurrentTurn = connections[roomID].P1Email
 			}
+			gameInstance := &db.DBGame{
+				ID: primitive.NewObjectID(),
+
+				P1Email: connections[roomID].P1Email,
+				P2Email: connections[roomID].P2Email,
+
+				P1Name: connections[roomID].P1Name,
+				P2Name: connections[roomID].P2Name,
+
+				RoomID: connections[roomID].RoomID,
+
+				P1Rating: connections[roomID].P1Rating,
+				P2Rating: connections[roomID].P2Rating,
+
+				P1Rank: connections[roomID].P1Rank,
+				P2Rank: connections[roomID].P2Rank,
+			}
+			db.CreateOrUpdateGame(*gameInstance)
+			connections[roomID].GameInstance = *gameInstance
 
 			conn.WriteJSON(connections[roomID])
 			connections[roomID].P1Conn.WriteJSON(connections[roomID])
-			connections[roomID].mu.Unlock()
+			mu.Unlock()
 			go ListenForWs(&conn, connections[roomID])
 		} else {
 			game := &Game{
@@ -132,6 +169,7 @@ func ServeWs(w http.ResponseWriter, r *http.Request) {
 			safelyCloseConnections(game.P1Conn, game.P2Conn, "126")
 			mu.Lock()
 			delete(connections, roomID)
+			game = EmptyGame
 			mu.Unlock()
 		}
 	}

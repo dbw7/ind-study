@@ -31,7 +31,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	state := req.URL.Query()["state"][0]
 	if state != "randomstate" {
 		fmt.Println("ms.go 31 error states dont match", state)
-		redirect := "http://localhost:5173/login?message=states-dont-match"
+		redirect := "http://localhost:5173/login?failed=states-dont-match"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"States do not match", "Error"}
 		//w.WriteHeader(400)
@@ -47,7 +47,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	token, err := microsoftConfig.Exchange(context.Background(), code)
 	if err != nil {
 		fmt.Println("ms.go 47 Code-Token Exchange Failed", err)
-		redirect := "http://localhost:5173/login?message=code-token-exchange-failed"
+		redirect := "http://localhost:5173/login?failed=code-token-exchange-failed"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"Code-Token Exchange Failed", "Error"}
 		//w.WriteHeader(500)
@@ -62,7 +62,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	resp, err := client.Get("https://graph.microsoft.com/v1.0/me")
 	if err != nil {
 		fmt.Println("ms.go 59 Error getting user", err)
-		redirect := "http://localhost:5173/login?message=error-getting-user-from-microsoft"
+		redirect := "http://localhost:5173/login?failed=error-getting-user-from-microsoft"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"Error getting user", "Error"}
 		//w.WriteHeader(500)
@@ -77,7 +77,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("ms.go 71 Parsing data failed", err)
-		redirect := "http://localhost:5173/login?message=error-parsing-body-data"
+		redirect := "http://localhost:5173/login?failed=error-parsing-body-data"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"Parsing data failed", "Error"}
 		//w.WriteHeader(500)
@@ -125,13 +125,13 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 			return
 		} else {
 			//This means there was an error parsing the token/verifying it
-			redirect := "http://localhost:5173/login?failed=true1"
+			redirect := "http://localhost:5173/login?failed=error-parsing-or-verifying-token"
 			http.Redirect(w, req, redirect, 302)
 			return
 		}
 	} else {
 		//This means there was an error creating the token
-		redirect := "http://localhost:5173/login?failed=true2"
+		redirect := "http://localhost:5173/login?failed=error-creating-token"
 		http.Redirect(w, req, redirect, 302)
 		return
 	}

@@ -34,7 +34,7 @@ var (
 
 func FindUser(user MicrosoftUser) (MicrosoftUser, bool) {
 	var result MicrosoftUser
-	filter := bson.M{"_id": user.ID}
+	filter := bson.M{"Id": user.MSID}
 	err := UserCollection.FindOne(Ctx, filter).Decode(&result)
 
 	if err != nil {
@@ -74,15 +74,15 @@ func FindOrCreateUser(user MicrosoftUser) bool {
 	}
 }
 
-func GetUsersName(userEmail string) string {
+func GetUsersNameRankAndRating(userEmail string) (string, int, int) {
 	var user MicrosoftUser
 	err := UserCollection.FindOne(Ctx, bson.M{"email": userEmail}).Decode(&user)
 	//fmt.Println("User", user, userEmail)
 	if err != nil {
 		fmt.Println("Error getting user name", err)
-		return ""
+		return "", 0, 0
 	} else {
-		return user.DisplayName
+		return user.DisplayName, user.Rank, user.Rating
 	}
 }
 

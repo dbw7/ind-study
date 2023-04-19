@@ -25,4 +25,5 @@ func init() {
 		fmt.Println("Successfully connected!")
 	}
 	UserCollection = client.Database("wschess").Collection("users")
+	GamesCollection = client.Database("wschess").Collection("games")
 }

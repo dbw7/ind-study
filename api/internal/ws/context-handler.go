@@ -8,7 +8,7 @@ import (
 
 func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 	//This is to timeout the game after both players have connected
-	timeoutTimer := time.NewTimer(300 * time.Second)
+	timeoutTimer := time.NewTimer(200 * time.Second)
 
 	for {
 		select {
@@ -18,7 +18,8 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 			mu.Lock()
 			safelyCloseConnections(game.P1Conn, game.P2Conn, "handleContext 18")
 			delete(connections, game.RoomID)
-			game = nil
+			game.GameInstance = *EmptyGameInstance
+			game = EmptyGame
 			mu.Unlock()
 			return
 		case <-timeoutTimer.C:
@@ -30,7 +31,8 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 				})
 				safelyCloseConnections(game.P1Conn, game.P2Conn, "handleContext 29")
 				delete(connections, game.RoomID)
-				game = nil
+				game.GameInstance = *EmptyGameInstance
+				game = EmptyGame
 			} else {
 				whoHasCurrentTurn := game.CurrentTurn
 				game.P1Conn.WriteJSON(map[string]interface{}{
@@ -47,9 +49,16 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 					"P1Email":     game.P1Email,
 					"P2Email":     game.P2Email,
 				})
+				game.GameInstance.Result = whoHasCurrentTurn + "Took too long"
+				if whoHasCurrentTurn == game.P1Email {
+					game.GameInstance.Winner = game.P2Email
+				} else {
+					game.GameInstance.Winner = game.P1Email
+				}
 				safelyCloseConnections(game.P1Conn, game.P2Conn, "handleContext 47")
 				delete(connections, game.RoomID)
-				game = nil
+				game.GameInstance = *EmptyGameInstance
+				game = EmptyGame
 			}
 			mu.Unlock()
 			return
@@ -59,7 +68,7 @@ func handleContext(ctx context.Context, conn WebSocketConnection, game *Game) {
 				<-timeoutTimer.C
 				//game.P1Conn.WriteMessage(websocket.TextMessage, []byte("No one has made a move"))
 			} else {
-				timeoutTimer.Reset(300 * time.Second)
+				timeoutTimer.Reset(200 * time.Second)
 			}
 
 		}

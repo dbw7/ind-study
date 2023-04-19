@@ -9,7 +9,7 @@ const EndGame = () => {
     
     return(
         <div className="end-game">
-            <GameEndBox iWon={data.iWon} winner={data.winner} loser={data.loser} tookTooLong={data.tookTooLong} />
+            <GameEndBox iWon={data.iWon} winner={data.winner} loser={data.loser} tookTooLong={data.tookTooLong} isDraw={data.isDraw} myOpponent={data.myOpponent} />
         </div>
     )
 }

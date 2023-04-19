@@ -22,41 +22,50 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     //const [iWon, setIwon] = useState<boolean>(false);
     //const [winner, setWinner] = useState<string>("");
     //const [loser, setLoser] = useState<string>("");
-    const [results, setResults] = useState<{winner: string, loser: string, iWon:boolean, tookTooLong:boolean}>({winner: "", loser: "", iWon: false, tookTooLong: false});
+    const [results, setResults] = useState<{winner: string, loser: string, iWon:boolean, tookTooLong:boolean, isDraw:boolean, myOpponent:string}>({winner: "", loser: "", iWon: false, tookTooLong: false, isDraw:false, myOpponent:""});
     
     const navigate = useNavigate();
     
     useEffect(()=>{
-      console.log(lastResponseData, "29292929")
-      if(lastResponseData?.SomeoneWon){
-        if(lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == lastResponseData.P1Email){
-          setResults((prevState)=>{
-            return {...prevState, winner: lastResponseData.P1Name, loser: lastResponseData.P2Name}
-          })
-        } else {
-          setResults((prevState)=>{
-            return {...prevState, winner: lastResponseData.P2Name, loser: lastResponseData.P1Name}
-          })
-        }
-        if(lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == email){
-          setResults((prevState)=>{
-            return {...prevState, iWon: true}
-          })
-        } else {
-          setResults((prevState)=>{
-            return {...prevState, iWon: false}
-          })
-        }
-        setRoomID("");
-      }
-    }, [lastResponseData])
+      	console.log(lastResponseData, "29292929")
+      	if(lastResponseData?.isDraw){
+			let myOpp = lastResponseData.P1Email == email ? lastResponseData.P2Name : lastResponseData.P1Name
+			console.log("Setting draw")
+			setResults((prevState)=>{
+            	return {...prevState, isDraw: true, myOpponent: myOpp}
+          	})
+        	setRoomID("");
+      	} else if(lastResponseData?.SomeoneWon){
+        	if(lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == lastResponseData.P1Email){
+          		setResults((prevState)=>{
+            	return {...prevState, winner: lastResponseData.P1Name, loser: lastResponseData.P2Name}})
+			} else {
+          		setResults((prevState)=>{
+            		return {...prevState, winner: lastResponseData.P2Name, loser: lastResponseData.P1Name}})
+        	}
+        	if(lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == email){
+          		setResults((prevState)=>{
+            		return {...prevState, iWon: true}
+          		})
+        	} else {
+          		setResults((prevState)=>{
+            		return {...prevState, iWon: false}
+          		})
+        	}
+			setRoomID("");
+    	}
+	}, [lastResponseData])
     
     useEffect(()=>{
         if(!gameStarted || !myTurn || !socket || lastResponseData?.SomeoneWon){
           return
         }
         const possibleMoves = game.moves();
-        if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0){
+		if(game.isDraw()){
+			let moveToSend:wsMove = JSON.parse(JSON.stringify(lastResponseData))
+          	moveToSend.isDraw = true;
+          	sendMsg(socket, moveToSend)
+		}else if (game.isGameOver() || possibleMoves.length === 0){
           let moveToSend:wsMove = JSON.parse(JSON.stringify(lastResponseData))
           moveToSend.SomeoneWon = true;
           sendMsg(socket, moveToSend)

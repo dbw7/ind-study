@@ -8,7 +8,6 @@ import InvalidBox from "../Box/InvalidBox/InvalidBox";
 import RoomBox from "../Box/RoomBox/RoomBox";
 import ErrorBox from "../Box/ErrorBox/ErrorBox";
 import ChessCountdown from "../ChessCountdown/ChessCountdown";
-import GameEndBox from "../Box/GameEndBox/GameEndBox";
 import { Navigate } from "react-router-dom";
 
 
@@ -29,7 +28,11 @@ const ChessBoard = (props:props) => {
       		{err && <ErrorBox></ErrorBox>}
       		{!err && (!props.room || (props.room.length != 3 && props.room != "initial") || props.room == "null") && <InvalidBox></InvalidBox>}
       		{(roomID && !gameStarted) && <RoomBox roomID={roomID} noJoin={noJoin}/>}
-      		{results.winner.length < 2 ? <div className="board">
+      		{
+			//If there is no winner and no draw, show the board, otherwise, show the endgame box
+			(results.winner.length < 2 && !results.isDraw)
+			? 
+			<div className="board">
         		{(gameStarted && !err) && 
 					<>
 						{<Typography fontFamily={"inter"} sx={{color:"white", fontWeight:"500"}} variant="h6">{firstTurn ? playerNames.b : playerNames.w} {(!results.winner && !myTurn) && <ChessCountdown />}</Typography> }

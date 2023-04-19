@@ -36,6 +36,25 @@
     min-height: fit-content;
     padding: 2%;
 }
+.end-game-box-draw{
+    width: 50vw;
+    height: 40vh;
+    /* background-image: linear-gradient(110.1deg,rgba(46,29,99,.4),#3d0f34);    */
+    /* background-image: linear-gradient(110.1deg,rgb(33 38 46),#192136);  */
+    background-color: hsl(250deg 21.43% 10.98%);
+    margin: auto;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border-color: hsl(270deg 32.97% 51.83%); */
+    /* border-color: #5381db; */
+    border-color: #e3e1e2;
+    border-style: solid;
+    box-shadow: rgb(243 0 56 / 15%) 0px 4px 24px;
+    min-height: fit-content;
+    padding: 2%;
+}
 
 @media (max-width: 1000px) {
     .end-game-box-win{
@@ -48,12 +67,20 @@
         height: fit-content;
         width: 80vw;
     }
+    .end-game-box-draw{
+        padding: 25px;
+        height: fit-content;
+        width: 80vw;
+    }
 }
 @media (max-height:753px) {
     .end-game-box-win{
         height: fit-content;
     }
     .end-game-box-lose{
+        height: fit-content;
+    }
+    .end-game-box-draw{
         height: fit-content;
     }
 }
