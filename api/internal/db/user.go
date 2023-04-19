@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"os"
 	"sort"
 )
 
@@ -88,7 +89,7 @@ func GetUsersNameRankAndRating(userEmail string) (string, int, int) {
 
 func GetUsersByRank(wantExtraInfo bool) []MicrosoftUser {
 	opts := options.Find().SetSort(bson.D{{Key: "rank", Value: 1}})
-	filter := bson.M{"email": bson.M{"$regex": "@villanova\\.edu", "$options": "i"}}
+	filter := bson.M{"email": bson.M{"$regex": "@+" + os.Getenv("COLL") + "+\\.edu", "$options": "i"}}
 	cursor, err := UserCollection.Find(Ctx, filter, opts)
 	if err != nil {
 		fmt.Println("Error getting users by rank1", err)
@@ -148,5 +149,53 @@ func UpdateUsersRanks() {
 		if err != nil {
 			fmt.Println("Error updating user rank 146", err)
 		}
+	}
+}
+
+func UpdateUserRating(userEmail string, rating int, won bool, draw bool) {
+	filter := bson.M{"email": userEmail}
+	var update bson.D
+	if won && !draw {
+		update = bson.D{{
+			Key: "$set",
+			Value: bson.D{
+				{Key: "rating", Value: rating},
+			},
+		},
+			{
+				Key: "$inc",
+				Value: bson.D{
+					{Key: "wins", Value: 1},
+				},
+			},
+		}
+	} else if draw {
+		update = bson.D{
+			{
+				Key: "$inc",
+				Value: bson.D{
+					{Key: "draws", Value: 1},
+				},
+			},
+		}
+	} else {
+		update = bson.D{{
+			Key: "$set",
+			Value: bson.D{
+				{Key: "rating", Value: rating},
+			},
+		},
+			{
+				Key: "$inc",
+				Value: bson.D{
+					{Key: "losses", Value: 1},
+				},
+			},
+		}
+	}
+	_, err := UserCollection.UpdateOne(Ctx, filter, update)
+	//fmt.Println("result", result)
+	if err != nil {
+		fmt.Println("Error updating user rating 146", err)
 	}
 }

@@ -4,21 +4,13 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
 	"independent-study-api/controllers"
 	"independent-study-api/internal/ws"
 	"independent-study-api/middleware"
 	"log"
 	"net/http"
+	"os"
 )
-
-func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println(err)
-		log.Fatalf("Error loading .env file")
-	}
-}
 
 func main() {
 	fmt.Println("Starting server...")
@@ -26,7 +18,7 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"https://*", "http://*"},
+		AllowedOrigins: []string{os.Getenv("CLIENT_URL")},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},

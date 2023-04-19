@@ -33,7 +33,7 @@ const App: React.FC = ()  => {
           {authCtx.isLoggedIn ? <Route path='/profile' element={<Profile />}/> : <Route path='/profile' element={<Navigate to="/login" replace />} />}
           {authCtx.isLoggedIn ? <Route path='/create-game' element={<CreateGame />} /> : <Route path='/create-game' element={<Navigate to="/login" replace />} />}
           {authCtx.isLoggedIn ? <Route path='/game' element={<Game />}/> : <Route path='/game' element={<Navigate to="/login" replace />} />}
-          {authCtx.isLoggedIn ? <Route path='/end-game' element={<EndGame />}/> : <Route path='/game' element={<Navigate to="/login" replace />} />}
+          {authCtx.isLoggedIn ? <Route path='/end-game' element={<EndGame />}/> : <Route path='/end-game' element={<Navigate to="/login" replace />} />}
       </Routes>
     </div>
   )

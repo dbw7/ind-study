@@ -35,9 +35,10 @@ const ChessBoard = (props:props) => {
 			<div className="board">
         		{(gameStarted && !err) && 
 					<>
-						{<Typography fontFamily={"inter"} sx={{color:"white", fontWeight:"500"}} variant="h6">{firstTurn ? playerNames.b : playerNames.w} {(!results.winner && !myTurn) && <ChessCountdown />}</Typography> }
+						{/* {<><Typography fontFamily={"inter"} sx={{color:"white", fontWeight:"500", display:"flex"}} variant="h6">{firstTurn ? playerNames.b : playerNames.w} {(!results.winner && !myTurn) && <ChessCountdown />}</Typography> </> } */}
+						{<div style={{display:"flex"}}>{(!results.winner && !myTurn) &&<Typography fontFamily={"inter"} sx={{color:"white"}} variant="h3">&#x2022;</Typography>}<Typography fontFamily={"inter"} sx={{color:"white", fontWeight:"500", display:"flex",  marginTop:"15px"}} variant="h6">{firstTurn ? playerNames.b : playerNames.w}{(!results.winner && !myTurn) && <ChessCountdown />}</Typography></div>}
 						<Chessboard  boardOrientation={firstTurn ? "white" : "black"} position={game.fen()} onPieceDrop={onDrop} arePiecesDraggable={results.winner.length < 2} />
-						{<Typography fontFamily={"inter"} sx={{color:"white", fontWeight:"500"}} variant="h6">{firstTurn ? playerNames.w : playerNames.b}{(!results.winner && myTurn) && <ChessCountdown />}</Typography>}
+						{<div style={{display:"flex"}}>{(!results.winner && myTurn) &&<Typography fontFamily={"inter"} sx={{color:"white"}} variant="h3">&#x2022;</Typography>}<Typography fontFamily={"inter"} sx={{color:"white", fontWeight:"500", display:"flex",  marginTop:"15px"}} variant="h6">{firstTurn ? playerNames.w : playerNames.b}{(!results.winner && myTurn) && <ChessCountdown />}</Typography></div>}
 					</>
 				}
 				</div>

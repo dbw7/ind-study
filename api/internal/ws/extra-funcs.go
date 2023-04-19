@@ -15,16 +15,6 @@ func contains(mapx map[string]*Game, room string) bool {
 	}
 }
 
-func getCurrentRoomIDs() []string {
-	keys := make([]string, len(connections))
-	i := 0
-	for k := range connections {
-		keys[i] = k
-		i++
-	}
-	return keys
-}
-
 func freshRoomID() string {
 	mu.Lock()
 	defer mu.Unlock()

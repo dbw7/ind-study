@@ -19,8 +19,10 @@ type DBGame struct {
 
 	RoomID string `bson:"roomID"`
 
-	P1Rating int `bson:"p1Rating"`
-	P2Rating int `bson:"p2Rating"`
+	OldP1Rating int `bson:"oldP1Rating"`
+	OldP2Rating int `bson:"oldP2Rating"`
+	NewP1Rating int `bson:"newP1Rating"`
+	NewP2Rating int `bson:"newP2Rating"`
 
 	P1Rank int `bson:"p1Rank"`
 	P2Rank int `bson:"p2Rank"`
@@ -55,7 +57,12 @@ func FindGame(gamex DBGame) (DBGame, bool) {
 	}
 }
 
-func CreateOrUpdateGame(dbgame DBGame) {
+func CreateOrUpdateGame(dbgame DBGame, updateUsersToo bool, p1Won bool, isDraw bool) {
+	if updateUsersToo {
+		UpdateUserRating(dbgame.P1Email, dbgame.NewP1Rating, p1Won, isDraw)
+		UpdateUserRating(dbgame.P2Email, dbgame.NewP2Rating, !p1Won, isDraw)
+		UpdateUsersRanks()
+	}
 	fmt.Println("Creating or updating game")
 	_, foundGame := FindGame(dbgame)
 	//fmt.Printf("in db game %+v\n", dbgame)
@@ -73,8 +80,10 @@ func CreateOrUpdateGame(dbgame DBGame) {
 			"winner":      dbgame.Winner,
 			"loser":       dbgame.Loser,
 			"quitter":     dbgame.Quitter,
-			"p1Rating":    dbgame.P1Rating,
-			"p2Rating":    dbgame.P2Rating,
+			"oldP1Rating": dbgame.OldP1Rating,
+			"oldP2Rating": dbgame.OldP2Rating,
+			"newP1Rating": dbgame.NewP1Rating,
+			"newP2Rating": dbgame.NewP2Rating,
 			"p1Rank":      dbgame.P1Rank,
 			"p2Rank":      dbgame.P2Rank,
 			"p1EloChange": dbgame.P1EloChange,

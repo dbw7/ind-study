@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"independent-study-api/internal/db"
+	"os"
 	"time"
 )
 
@@ -12,7 +13,7 @@ type JWTClaims struct {
 	*jwt.RegisteredClaims
 }
 
-var jwtKey = []byte("Secretkey")
+var jwtKey = []byte(os.Getenv("JWT"))
 
 func CreateToken(sub string, userInfo db.MicrosoftUser) (string, bool) {
 	// Get the token instance with the Signing method

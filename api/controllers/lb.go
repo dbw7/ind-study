@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"independent-study-api/internal/db"
 	"net/http"
+	"os"
 	"strings"
 )
 
 func LeaderboardHandler(w http.ResponseWriter, r *http.Request) {
 	userData, ok := r.Context().Value("props").(db.MicrosoftUser)
 	if ok {
-		if !strings.Contains(userData.Email, "@villanova.edu") {
+		if !strings.Contains(userData.Email, os.Getenv("EMAIL_SUB")) {
 			w.WriteHeader(403)
 			return
 		}

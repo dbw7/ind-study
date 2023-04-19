@@ -18,5 +18,13 @@ type Game = {
 	SomeoneWon: boolean,
 	SomeoneQuit: boolean,
 	isDraw: boolean,
+	
+	P1Rating: string,
+	P2Rating: string,
+	P1EloChange: string,
+	P2EloChange: string,
+	NewP1Rating: string,
+	NewP2Rating: string,
+	tookTooLong:string
 }
 export default Game;

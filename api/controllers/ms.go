@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -10,7 +12,9 @@ import (
 	"independent-study-api/internal/db"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
+	"time"
 )
 
 type JsonResponse struct {
@@ -19,19 +23,35 @@ type JsonResponse struct {
 	MessageType string `json:"message_type"`
 }
 
+func generateStateOauthCookie(w http.ResponseWriter) string {
+	var expiration = time.Now().Add(365 * 24 * time.Hour)
+
+	b := make([]byte, 16)
+	rand.Read(b)
+	state := base64.URLEncoding.EncodeToString(b)
+	cookie := http.Cookie{Name: "oauthstate", Value: state, Expires: expiration}
+	http.SetCookie(w, &cookie)
+
+	return state
+}
+
 func MicrosoftLogin(w http.ResponseWriter, req *http.Request) {
 	microsoftConfig := config.SetupConfig()
-	url := microsoftConfig.AuthCodeURL("randomstate")
+	oauthState := generateStateOauthCookie(w)
+	url := microsoftConfig.AuthCodeURL(oauthState)
 	http.Redirect(w, req, url, http.StatusSeeOther)
 }
 
 func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	state := req.URL.Query()["state"][0]
-	if state != "randomstate" {
-		fmt.Println("ms.go 31 error states dont match", state)
-		redirect := "http://localhost:5173/login?failed=states-dont-match"
+	//state := req.URL.Query()["state"][0]
+	//
+	//if state != "randomstate" {
+	oauthState, _ := req.Cookie("oauthstate")
+	if req.FormValue("state") != oauthState.Value {
+		fmt.Println("ms.go 31 error states dont match")
+		redirect := os.Getenv("CLIENT_URL") + "/login?failed=states-dont-match"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"States do not match", "Error"}
 		//w.WriteHeader(400)
@@ -47,7 +67,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	token, err := microsoftConfig.Exchange(context.Background(), code)
 	if err != nil {
 		fmt.Println("ms.go 47 Code-Token Exchange Failed", err)
-		redirect := "http://localhost:5173/login?failed=code-token-exchange-failed"
+		redirect := os.Getenv("CLIENT_URL") + "/login?failed=code-token-exchange-failed"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"Code-Token Exchange Failed", "Error"}
 		//w.WriteHeader(500)
@@ -62,7 +82,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	resp, err := client.Get("https://graph.microsoft.com/v1.0/me")
 	if err != nil {
 		fmt.Println("ms.go 59 Error getting user", err)
-		redirect := "http://localhost:5173/login?failed=error-getting-user-from-microsoft"
+		redirect := os.Getenv("CLIENT_URL") + "/login?failed=error-getting-user-from-microsoft"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"Error getting user", "Error"}
 		//w.WriteHeader(500)
@@ -77,7 +97,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("ms.go 71 Parsing data failed", err)
-		redirect := "http://localhost:5173/login?failed=error-parsing-body-data"
+		redirect := os.Getenv("CLIENT_URL") + "/login?failed=error-parsing-body-data"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"Parsing data failed", "Error"}
 		//w.WriteHeader(500)
@@ -91,7 +111,7 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 	var user db.MicrosoftUser
 	if err := json.Unmarshal(body, &user); err != nil {
 		fmt.Println("ms.go 84 Can not unmarshal JSON", err)
-		redirect := "http://localhost:5173/login?message=cant-unmarshal-microsoft-data"
+		redirect := os.Getenv("CLIENT_URL") + "/login?message=cant-unmarshal-microsoft-data"
 		http.Redirect(w, req, redirect, 302)
 		//response := JsonResponse{"Error unmarshalling Microsoft response", "Error"}
 		//w.WriteHeader(500)
@@ -120,18 +140,18 @@ func MicrosoftCallback(w http.ResponseWriter, req *http.Request) {
 		_, tokenValidlyParsed := helper.ParseToken(tokenString)
 		if tokenValidlyParsed {
 			//This means the token was validly created and validly parsed for verification
-			redirect := "http://localhost:5173/login?token=" + tokenString + "&firstTime=" + strconv.FormatBool(!existsInDbAlready)
+			redirect := os.Getenv("CLIENT_URL") + "/login?token=" + tokenString + "&firstTime=" + strconv.FormatBool(!existsInDbAlready)
 			http.Redirect(w, req, redirect, 302)
 			return
 		} else {
 			//This means there was an error parsing the token/verifying it
-			redirect := "http://localhost:5173/login?failed=error-parsing-or-verifying-token"
+			redirect := os.Getenv("CLIENT_URL") + "/login?failed=error-parsing-or-verifying-token"
 			http.Redirect(w, req, redirect, 302)
 			return
 		}
 	} else {
 		//This means there was an error creating the token
-		redirect := "http://localhost:5173/login?failed=error-creating-token"
+		redirect := os.Getenv("CLIENT_URL") + "/login?failed=error-creating-token"
 		http.Redirect(w, req, redirect, 302)
 		return
 	}

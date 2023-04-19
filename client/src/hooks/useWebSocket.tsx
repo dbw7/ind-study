@@ -22,36 +22,42 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
     //const [iWon, setIwon] = useState<boolean>(false);
     //const [winner, setWinner] = useState<string>("");
     //const [loser, setLoser] = useState<string>("");
-    const [results, setResults] = useState<{winner: string, loser: string, iWon:boolean, tookTooLong:boolean, isDraw:boolean, myOpponent:string}>({winner: "", loser: "", iWon: false, tookTooLong: false, isDraw:false, myOpponent:""});
+    const [results, setResults] = useState<{winner: string, loser: string, iWon:boolean, tookTooLong:boolean, isDraw:boolean, myOpponent:string, newRating:string, eloChange:string, someoneQuit:boolean}>({winner: "", loser: "", iWon: false, tookTooLong: false, isDraw:false, myOpponent:"", newRating:"", eloChange:"", someoneQuit:false});
     
     const navigate = useNavigate();
     
     useEffect(()=>{
-      	console.log(lastResponseData, "29292929")
+      console.log(lastResponseData)
       	if(lastResponseData?.isDraw){
 			let myOpp = lastResponseData.P1Email == email ? lastResponseData.P2Name : lastResponseData.P1Name
-			console.log("Setting draw")
+			//console.log("Setting draw")
 			setResults((prevState)=>{
             	return {...prevState, isDraw: true, myOpponent: myOpp}
           	})
         	setRoomID("");
       	} else if(lastResponseData?.SomeoneWon){
         	if(lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == lastResponseData.P1Email){
-          		setResults((prevState)=>{
-            	return {...prevState, winner: lastResponseData.P1Name, loser: lastResponseData.P2Name}})
+				if(lastResponseData.P1Email == email){
+					setResults((prevState)=>{
+					  return {...prevState, iWon: true, winner: lastResponseData.P1Name, loser: lastResponseData.P2Name, newRating:lastResponseData.NewP1Rating, eloChange:lastResponseData.P1EloChange}
+					})
+			  } else {
+					setResults((prevState)=>{
+					  return {...prevState, iWon: false, winner: lastResponseData.P1Name, loser: lastResponseData.P2Name, newRating:lastResponseData.NewP2Rating, eloChange:lastResponseData.P2EloChange}
+					})
+			  }
 			} else {
-          		setResults((prevState)=>{
-            		return {...prevState, winner: lastResponseData.P2Name, loser: lastResponseData.P1Name}})
+				if(lastResponseData.P2Email == email){
+					setResults((prevState)=>{
+					  return {...prevState, iWon: true, winner: lastResponseData.P2Name, loser: lastResponseData.P1Name, newRating:lastResponseData.NewP2Rating, eloChange:lastResponseData.P2EloChange}
+					})
+				} else {
+					setResults((prevState)=>{
+						return {...prevState, iWon: false, winner: lastResponseData.P2Name, loser: lastResponseData.P1Name, newRating:lastResponseData.NewP1Rating, eloChange:lastResponseData.P1EloChange}
+					})
+				}
         	}
-        	if(lastResponseData.EmailOfOneWhoMadeLastMoveAKAWinner == email){
-          		setResults((prevState)=>{
-            		return {...prevState, iWon: true}
-          		})
-        	} else {
-          		setResults((prevState)=>{
-            		return {...prevState, iWon: false}
-          		})
-        	}
+        	
 			setRoomID("");
     	}
 	}, [lastResponseData])
@@ -138,7 +144,7 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
           if(data1.tookTooLong){
             handleTimeout(data1);
             setRoomID("");
-            console.log("this player took too long", data1.tookTooLong)
+            console.log("this player took too long to make a move", data1.tookTooLong)
             return
           }
           let data:Game = data1;
@@ -207,25 +213,29 @@ const useWebsocket = (room:string, email:string, authCtx:AuthContextType) => {
             setSocket(null);
         };
       }, [])
-    const handleTimeout = (data1:any) => {
-		if(data1.tookTooLong == data1.P2Email){
-        	setResults((prevState)=>{
-            	return {...prevState, winner: data1.P1Name, loser: data1.P2Name}
-            })
-        } else {
-        	setResults((prevState)=>{
-            	return {...prevState, winner: data1.P2Name, loser: data1.P1Name}
-            })
-        }
-        if(data1.tookTooLong != email){
-        	setResults((prevState)=>{
-              	return {...prevState, iWon: true, tookTooLong: true}
-            })
-        } else {
-        	setResults((prevState)=>{
-              	return {...prevState, iWon: false, tookTooLong: true}
-            })
-        }    
+    const handleTimeout = (data1:Game) => {
+		if(data1.tookTooLong != data1.P1Email){
+			if(data1.P1Email == email){
+				setResults((prevState)=>{
+				  return {...prevState, iWon: true, winner: data1.P1Name, loser: data1.P2Name, newRating:data1.NewP1Rating, eloChange:data1.P1EloChange, tookTooLong:true}
+				})
+		  } else {
+				setResults((prevState)=>{
+				  return {...prevState, iWon: false, winner: data1.P1Name, loser: data1.P2Name, newRating:data1.NewP2Rating, eloChange:data1.P2EloChange, tookTooLong:true}
+				})
+		  }
+		} else {
+			if(data1.P2Email == email){
+				setResults((prevState)=>{
+				  return {...prevState, iWon: true, winner: data1.P2Name, loser: data1.P1Name, newRating:data1.NewP2Rating, eloChange:data1.P2EloChange, tookTooLong:true}
+				})
+			} else {
+				setResults((prevState)=>{
+					return {...prevState, iWon: false, winner: data1.P2Name, loser: data1.P1Name, newRating:data1.NewP1Rating, eloChange:data1.P1EloChange, tookTooLong:true}
+				})
+			}
+		}
+          
     }
     return {game, socket, roomID, err, errorMessage, gameStarted, firstTurn, onDrop, playerNames, noJoin, myTurn, results}
   

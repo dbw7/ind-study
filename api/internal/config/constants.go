@@ -6,12 +6,11 @@ import (
 	"golang.org/x/oauth2"
 )
 
-
-func SetupConfig() *oauth2.Config{
+func SetupConfig() *oauth2.Config {
 	conf := &oauth2.Config{
 		ClientID:     os.Getenv("CLIENT_ID"),
 		ClientSecret: os.Getenv("CLIENT_SECRET"),
-		RedirectURL:  "http://localhost:8080/auth/ms",
+		RedirectURL:  os.Getenv("SERVER_URL") + "/auth/ms",
 		Scopes: []string{
 			"https://graph.microsoft.com/User.Read",
 		},

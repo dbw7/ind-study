@@ -26,7 +26,7 @@ const useLogin = () => {
         
         (async () =>{
             let token = tokenParams.get("token");
-            console.log(token)
+            //console.log(token)
             if(!token){
                 return
             }
@@ -56,7 +56,7 @@ const useLogin = () => {
                 rank: responseJSON.rank,
             }
             authCtx.current.login(token, userData);
-            console.log("response json", userData)
+            //console.log("response json", userData)
             navigate.current('/create-game');  
             
         })()

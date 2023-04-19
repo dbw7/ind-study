@@ -21,9 +21,9 @@ const GameEndBox = (props:Results) => {
                 </Typography>
                 <br></br>
                 <div className="code">
-                    <Typography  color={props.iWon ? "#ced8c7" : "#a1579e"} fontFamily={"inter"} fontWeight="700" variant="h5" >{props.iWon ? "Elo Gained:" : "Elo Lost:"}</Typography>
+                    <Typography  color={props.iWon ? "#ced8c7" : "#a1579e"} fontFamily={"inter"} fontWeight="700" variant="h5" >{props.iWon ? `Elo Gained: ${props.eloChange}` : `Elo Lost: ${props.eloChange}`}</Typography>
                     <br></br>
-                    <Typography  color={props.iWon ? "#ced8c7" : "#a1579e"} fontFamily={"inter"} fontWeight="700" variant="h5" >New Rating:</Typography>
+                    <Typography  color={props.iWon ? "#ced8c7" : "#a1579e"} fontFamily={"inter"} fontWeight="700" variant="h5" >New Rating: {props.newRating}</Typography>
                 </div>
                 <br></br>
                 <CreateGameButton version={2} text="New Game" />

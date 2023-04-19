@@ -60,12 +60,13 @@ func ListenToWsChannel() {
 			response.P2Rating = rating2Int
 			response.P1EloChange = elo1Change
 			response.P2EloChange = elo2Change
-			connections[room].GameInstance.P1Rating = rating1Int
-			connections[room].GameInstance.P2Rating = rating2Int
+			connections[room].GameInstance.NewP1Rating = rating1Int
+			connections[room].GameInstance.NewP2Rating = rating2Int
 			connections[room].GameInstance.P1EloChange = elo1Change
 			connections[room].GameInstance.P2EloChange = elo2Change
+			connections[room].GameInstance.Result = connections[room].GameInstance.Winner + " won against " + connections[room].GameInstance.Loser
 			//fmt.Printf("%+v\n", connections[room].GameInstance)
-			db.CreateOrUpdateGame(connections[room].GameInstance)
+			db.CreateOrUpdateGame(connections[room].GameInstance, true, p1IsWinner, false)
 			err := conn1.WriteJSON(response)
 			if err != nil {
 				log.Println("Websocket err")
@@ -75,11 +76,15 @@ func ListenToWsChannel() {
 				log.Println("Websocket err")
 			}
 
+			connections[room].CancelContext()
+
 			safelyCloseConnections(connections[room].P1Conn, connections[room].P2Conn, "channel 47")
 			connections[room].GameInstance = *EmptyGameInstance
 			connections[room] = EmptyGame
 			delete(connections, room)
 		} else if event.IsDraw {
+			connections[room].GameInstance.Result = "Game was a draw"
+			db.CreateOrUpdateGame(connections[room].GameInstance, true, false, true)
 			err := conn1.WriteJSON(response)
 			if err != nil {
 				log.Println("Websocket err")
@@ -88,6 +93,9 @@ func ListenToWsChannel() {
 			if err != nil {
 				log.Println("Websocket err")
 			}
+
+			connections[room].CancelContext()
+
 			safelyCloseConnections(connections[room].P1Conn, connections[room].P2Conn, "channel 50")
 			connections[room].GameInstance = *EmptyGameInstance
 			connections[room] = EmptyGame
