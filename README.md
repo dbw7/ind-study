@@ -7,7 +7,7 @@ It is handled through a Golang server running Go-Chi and Gorilla-websockets.
 The Golang backend is hosted on [render](https://render.com/).<br>
 The frontend is a React site built using TypeScript and hosted on Firebase.
 
-I build JWT tokens using information from Microsoft's graph API for authentication, essentially Microsoft login.
+I built JWT tokens using information from Microsoft's graph API for authentication, essentially Microsoft login.
 
 I use MongoDB as my database.
 
